@@ -815,6 +815,8 @@ textarea{resize:vertical;min-height:70px}
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <input id="db-search" type="search" placeholder="🔍 Buscar..." oninput="renderDBEditor(window._dbFilter||'all')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;width:180px">
         <button onclick="openExModal(null,null)" class="btn btn-primary" style="white-space:nowrap">+ Añadir</button>
+        <button onclick="exportDBBackup()" class="btn btn-secondary" style="white-space:nowrap;font-size:12px" title="Descargar copia de ejercicios personalizados">⬇ Copia DB</button>
+        <label class="btn btn-secondary" style="white-space:nowrap;font-size:12px;cursor:pointer;margin:0" title="Restaurar copia de ejercicios">⬆ Restaurar DB<input type="file" accept=".json" onchange="importDBBackup(event)" style="display:none"></label>
         <button onclick="confirmResetDB()" class="btn btn-secondary" style="white-space:nowrap;font-size:12px" title="Restaurar base de datos original">↺ Restaurar</button>
       </div>
     </div>
@@ -7496,6 +7498,64 @@ function exportBackup(){
   a.click();
   URL.revokeObjectURL(url);
   showToast("✓ Copia de seguridad descargada");
+}
+
+// ── DB BACKUP: EXPORT ─────────────────────────────────────────────────────
+function exportDBBackup(){
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,"0");
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+  const custom=JSON.parse(localStorage.getItem("activ_db_custom")||"null");
+  const data={
+    version:1,
+    type:"db_backup",
+    exportedAt:now.toISOString(),
+    activ_db_custom:custom
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`activ_db_backup_${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  const count=custom?Object.values(custom).reduce(function(acc,v){return acc+(Array.isArray(v)?v.length:0);},0):0;
+  showToast("⬇ Base de datos descargada — "+count+" ejercicios personalizados");
+}
+
+// ── DB BACKUP: IMPORT ─────────────────────────────────────────────────────
+function importDBBackup(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file){return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data||data.version!==1||data.type!=="db_backup"){
+        showToast("❌ Archivo no válido — usa una copia generada desde Base de Ejercicios");
+        return;
+      }
+      const count=data.activ_db_custom
+        ?Object.values(data.activ_db_custom).reduce(function(acc,v){return acc+(Array.isArray(v)?v.length:0);},0)
+        :0;
+      const exportDate=new Date(data.exportedAt).toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"});
+      if(!confirm("¿Restaurar base de ejercicios?\n\n• "+count+" ejercicio"+(count===1?"":"s")+" personalizado"+(count===1?"":"s")+"\n• Exportada el "+exportDate+"\n\nEsto reemplazará los ejercicios personalizados actuales.")){
+        event.target.value="";return;
+      }
+      if(data.activ_db_custom){
+        localStorage.setItem("activ_db_custom",JSON.stringify(data.activ_db_custom));
+      } else {
+        localStorage.removeItem("activ_db_custom");
+      }
+      if(typeof initCustomDB==="function") initCustomDB();
+      if(typeof renderDBEditor==="function") renderDBEditor(window._dbFilter||"all");
+      showToast("✓ Base de ejercicios restaurada — "+count+" ejercicios cargados");
+    }catch(err){
+      showToast("❌ Error al leer el archivo: "+err.message);
+    }
+    event.target.value="";
+  };
+  reader.readAsText(file);
 }
 
 // ── BACKUP: IMPORT ────────────────────────────────────────────────────────
