@@ -794,7 +794,11 @@ textarea{resize:vertical;min-height:70px}
         <div class="card-title" style="margin:0">Historial de Sesiones</div>
         <div id="hist-count" style="font-size:12px;color:var(--text2);margin-top:3px"></div>
       </div>
-      <button class="btn btn-danger" onclick="clearHistory()">🗑 Limpiar todo</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="exportBackup()">⬇ Descargar copia</button>
+        <label class="btn btn-secondary" style="cursor:pointer;margin:0">⬆ Restaurar copia<input type="file" accept=".json" onchange="importBackup(event)" style="display:none"></label>
+        <button class="btn btn-danger" onclick="clearHistory()">🗑 Limpiar todo</button>
+      </div>
     </div>
     <div id="hist-list"><div class="empty"><h3>Sin sesiones guardadas</h3><p>Genera y guarda sesiones para verlas aquí</p></div></div>
   </div>
@@ -4013,16 +4017,31 @@ function loadHistSession(idx){
 
 function deleteSession(idx){
   const hist=getHistory();
+  const sess=hist[idx];
+  const label=sess?(new Date(sess.date).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"})+(sess.client?" · "+sess.client:"")):"esta sesión";
+  if(!confirm("¿Eliminar "+label+"?\n\nEsta acción no se puede deshacer."))return;
   hist.splice(idx,1);
   localStorage.setItem("gp_history",JSON.stringify(hist));
   renderHistory();
+  _refreshDashboardIfActive();
   showToast("Sesión eliminada");
 }
 
 function clearHistory(){
-  if(!confirm("¿Eliminar todo el historial?"))return;
+  const hist=getHistory();
+  if(!hist.length){showToast("El historial ya está vacío");return;}
+  if(!confirm("¿Eliminar TODO el historial?\n\n"+hist.length+" sesión"+(hist.length===1?"":"es")+" se borrarán permanentemente.\n\nEsta acción no se puede deshacer."))return;
   localStorage.removeItem("gp_history");
   renderHistory();
+  _refreshDashboardIfActive();
+  showToast("Historial eliminado");
+}
+
+function _refreshDashboardIfActive(){
+  const dashPanel=document.getElementById("tab-dashboard");
+  if(dashPanel&&dashPanel.classList.contains("active")){
+    renderDashboard();
+  }
 }
 
 // ============================================================
@@ -4974,401 +4993,304 @@ function computeSessionMetrics(sess){
   return{sets,repsNum,totalSets:exercises.length*sets,totalReps:exercises.length*sets*repsNum,patCount,patterns:[...new Set(exercises.map(e=>e.pattern))],formatId:fmt.id,formatName:fmt.name,sessionType:sess.sessionType};
 }
 
+function _applyDashCustomRange(){
+  const f=document.getElementById("dash-from"),t=document.getElementById("dash-to");
+  if(!f||!t||!f.value||!t.value){showToast("Selecciona fecha de inicio y fin");return;}
+  const from=new Date(f.value+"T00:00:00"),to=new Date(t.value+"T23:59:59");
+  if(isNaN(from)||isNaN(to)){showToast("Fechas no válidas");return;}
+  if(to<from){showToast("La fecha de fin debe ser posterior al inicio");return;}
+  const diffDays=(to-from)/86400000;
+  if(diffDays>184){showToast("El rango máximo es 6 meses");return;}
+  window._dashPeriod="custom";
+  window._dashFrom=from.getTime();
+  window._dashTo=to.getTime();
+  renderDashboard();
+}
+
 function renderDashboard(){
   const container=document.getElementById("dash-output");
 
-  // ── Gather sessions ──────────────────────────────────────────
-  const weekDays=(window._currentWeek||[]).filter(d=>!d.rest);
-  const weekSessions=weekDays.map(d=>({...d.sess,sessionType:d.st?.css==="load"?"high_load":"high_metabolic"}));
-  const monthSessions=window._currentMonth
-    ?window._currentMonth.flatMap(w=>w.days.filter(d=>!d.rest).map(d=>({...d.sess,sessionType:d.st?.css==="load"?"high_load":"high_metabolic"})))
-    :[];
-  const histRaw=JSON.parse(localStorage.getItem("gp_history")||"[]");
+  // ── Period selector state ────────────────────────────────────
+  if(window._dashPeriod===undefined) window._dashPeriod=30;
+  const period=window._dashPeriod; // days, 0=all, "custom"=date range
 
-  const primary=monthSessions.length>0?monthSessions:weekSessions.length>0?weekSessions:histRaw;
-  const sourceLabel=monthSessions.length>0?`Plan mensual — ${monthSessions.length} sesiones generadas`:weekSessions.length>0?`Plan semanal — ${weekSessions.length} sesiones generadas`:`Historial guardado — ${histRaw.length} sesiones`;
+  // ── Gather sessions from history ─────────────────────────────
+  const allHist=getHistory();
+  const now=Date.now();
+  let sessions;
+  if(period==="custom"){
+    const from=window._dashFrom||0, to=window._dashTo||now;
+    sessions=allHist.filter(s=>{const t=new Date(s.date||0).getTime();return t>=from&&t<=to;});
+  } else {
+    sessions=period===0?allHist:allHist.filter(s=>{const t=new Date(s.date||0).getTime();return t>=now-period*86400000;});
+  }
 
-  if(!primary.length){
-    container.innerHTML=`<div class="card" style="text-align:center;padding:48px 24px">
+  // ── Period selector HTML ─────────────────────────────────────
+  const periods=[{d:7,l:"7 días"},{d:14,l:"14 días"},{d:30,l:"30 días"},{d:90,l:"3 meses"},{d:180,l:"6 meses"},{d:0,l:"Todo"}];
+  const periodBtnsHtml=periods.map(p=>{
+    const active=period===p.d;
+    return `<button onclick="window._dashPeriod=${p.d};window._dashFrom=null;window._dashTo=null;renderDashboard()" style="padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:${active?"var(--primary)":"var(--surface)"};color:${active?"#fff":"var(--text)"};font-size:12px;font-weight:${active?"700":"500"};cursor:pointer;transition:all .15s">${p.l}</button>`;
+  }).join("");
+
+  // ── Get today and 6-months-ago for date input limits ─────────
+  const todayStr=new Date().toISOString().split("T")[0];
+  const sixMonthsAgo=new Date();sixMonthsAgo.setMonth(sixMonthsAgo.getMonth()-6);
+  const defaultFrom=window._dashFrom?new Date(window._dashFrom).toISOString().split("T")[0]:(()=>{const d=new Date();d.setDate(d.getDate()-30);return d.toISOString().split("T")[0];})();
+  const defaultTo=window._dashTo?new Date(window._dashTo).toISOString().split("T")[0]:todayStr;
+  const customActive=period==="custom";
+
+  const periodSelectorHtml=`
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-right:2px">Período</span>
+      ${periodBtnsHtml}
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">Rango personalizado</span>
+      <span style="font-size:11px;color:var(--text3)">De</span>
+      <input type="date" id="dash-from" value="${defaultFrom}" max="${todayStr}" style="border:1.5px solid ${customActive?"var(--primary)":"var(--border)"};border-radius:8px;padding:4px 8px;font-size:12px;background:var(--bg);color:var(--text);font-family:inherit;cursor:pointer">
+      <span style="font-size:11px;color:var(--text3)">a</span>
+      <input type="date" id="dash-to" value="${defaultTo}" max="${todayStr}" style="border:1.5px solid ${customActive?"var(--primary)":"var(--border)"};border-radius:8px;padding:4px 8px;font-size:12px;background:var(--bg);color:var(--text);font-family:inherit;cursor:pointer">
+      <button onclick="_applyDashCustomRange()" style="padding:5px 14px;border-radius:20px;border:1.5px solid var(--primary);background:${customActive?"var(--primary)":"var(--surface)"};color:${customActive?"#fff":"var(--primary)"};font-size:12px;font-weight:700;cursor:pointer;transition:all .15s">Aplicar</button>
+      ${customActive?`<span style="font-size:11px;font-weight:600;color:var(--primary)">✓ Rango activo: ${new Date(window._dashFrom).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})} — ${new Date(window._dashTo).toLocaleDateString("es-ES",{day:"numeric",month:"short",year:"numeric"})}</span>`:""}
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">Máximo 6 meses por rango personalizado · ${sessions.length} sesión${sessions.length===1?"":"es"} en el período seleccionado</div>
+  </div>`;
+
+  // Empty state
+  if(!sessions.length){
+    container.innerHTML=periodSelectorHtml+`<div class="card" style="text-align:center;padding:48px 24px">
       <div style="font-size:48px;margin-bottom:14px">📊</div>
-      <div style="font-weight:700;font-size:18px;margin-bottom:8px">Dashboard vacío</div>
-      <div style="color:var(--text2);font-size:14px;max-width:420px;margin:0 auto;line-height:1.6">Genera un <strong>plan semanal</strong> o <strong>mensual</strong> y vuelve aquí para ver el análisis completo.</div>
+      <div style="font-weight:700;font-size:18px;margin-bottom:8px">Sin sesiones en este período</div>
+      <div style="color:var(--text2);font-size:14px;max-width:420px;margin:0 auto;line-height:1.6">Guarda sesiones desde cualquier pestaña o amplía el período de análisis.</div>
     </div>`;
     return;
   }
 
-  // ── Aggregate metrics ────────────────────────────────────────
-  const allM=primary.map(s=>computeSessionMetrics(s));
-  const totalSess=primary.length;
-  const loadSess=primary.filter(s=>s.sessionType==="high_load").length;
-  const metaSess=primary.filter(s=>s.sessionType==="high_metabolic").length;
-  const weeksN=monthSessions.length>0?4:1;
-  const freqPerWeek=(totalSess/weeksN).toFixed(1);
+  // ── Weeks in period (for weekly avg) ────────────────────────
+  const weeksN=period==="custom"
+    ?Math.max(1,(window._dashTo-window._dashFrom)/(7*86400000))
+    :period===0
+      ?(()=>{
+          const dates=allHist.map(s=>new Date(s.date||0).getTime()).filter(t=>!isNaN(t));
+          if(!dates.length) return 1;
+          const span=(Math.max(...dates)-Math.min(...dates))/(7*86400000);
+          return Math.max(1,Math.round(span)||1);
+        })()
+      :Math.max(1,period/7);
 
-  // Pattern volume
-  const patVol={};
-  ALL_PATS.forEach(p=>patVol[p]=0);
-  allM.forEach(m=>Object.entries(m.patCount).forEach(([p,v])=>patVol[p]=(patVol[p]||0)+v));
+  // ── Sets per format ─────────────────────────────────────────
+  const SETS_BY_FMT={emom:3,e2mom:3,e3mom:5,amrap:3,density_block:4,circuit:3,superset:3,ladder:3,hybrid_intervals:3,fortime:3,interval_str:3};
+  function setsForFmt(fmtId){return SETS_BY_FMT[fmtId]||3;}
 
-  const pushTotal=(patVol.push_h||0)+(patVol.push_v||0);
-  const pullTotal=(patVol.pull_h||0)+(patVol.pull_v||0);
-  const lowerTotal=(patVol.hinge||0)+(patVol.squat||0);
-  const upperTotal=pushTotal+pullTotal;
-  const ppRatio=pushTotal>0?(pullTotal/pushTotal).toFixed(2):"—";
-  const ulRatio=upperTotal>0?(lowerTotal/upperTotal).toFixed(2):"—";
-
-  const totalSets=allM.reduce((s,m)=>s+m.totalSets,0);
-  const totalReps=allM.reduce((s,m)=>s+m.totalReps,0);
-  const avgSetsPerSess=totalSess>0?Math.round(totalSets/totalSess):0;
-
-  const fmtCount={};
-  allM.forEach(m=>{fmtCount[m.formatName]=(fmtCount[m.formatName]||0)+1;});
-  const uniqueFmts=Object.keys(fmtCount).length;
-
-  const avgPats=allM.length?(allM.reduce((s,m)=>s+m.patterns.length,0)/allM.length).toFixed(1):0;
-
-  // Muscle volume (accumulate sets per muscle)
-  const muscleVol={};
-  allM.forEach(m=>Object.entries(m.patCount).forEach(([pat,sets])=>{
-    (PAT_MUSCLES[pat]||[]).forEach(muscle=>{muscleVol[muscle]=(muscleVol[muscle]||0)+sets;});
-  }));
-  const topMuscles=Object.entries(muscleVol).sort((a,b)=>b[1]-a[1]);
-  const maxMusVol=topMuscles.length?topMuscles[0][1]:1;
-
-  // Intensity from month data
-  const monthData=window._currentMonth;
-  let rpeVals=[];
-  if(monthData){
-    monthData.forEach(w=>w.days.filter(d=>!d.rest).forEach(d=>{
-      const s=d.sess;const m2=PROGRAM_MONTHS[s.mesPrograma||1];
-      const wd=m2?m2.weeks[(s.semPrograma||1)-1]||m2.weeks[0]:null;
-      if(wd&&wd.rpe){const r=parseFloat(wd.rpe);if(!isNaN(r))rpeVals.push(r);}
-    }));
-  }
-  const avgRPE=rpeVals.length?(rpeVals.reduce((a,b)=>a+b,0)/rpeVals.length).toFixed(1):"—";
-
-  // ── Recommendations ──────────────────────────────────────────
-  const rec=[];
-  if(pullTotal<pushTotal)rec.push({t:"alert",i:"⚠️",msg:`Ratio tirón:empuje = ${ppRatio}. El objetivo es ≥1.5 para proteger el manguito rotador. Añade más remos o jalones.`});
-  else rec.push({t:"ok",i:"✅",msg:`Ratio tirón:empuje correcto (${ppRatio}:1). Balance articular del hombro mantenido.`});
-
-  if(parseFloat(avgPats)<5.5)rec.push({t:"warn",i:"💡",msg:`Media de ${avgPats} patrones/sesión. El objetivo es cubrir los 6 patrones fundamentales en cada sesión para evitar desequilibrios.`});
-  else rec.push({t:"ok",i:"✅",msg:`Cobertura de patrones óptima (${avgPats}/sesión). Todas las cadenas musculares están entrenadas.`});
-
-  if(uniqueFmts<3)rec.push({t:"warn",i:"💡",msg:`Solo ${uniqueFmts} método${uniqueFmts===1?"":"s"} de entrenamiento. Aumenta la variedad de formatos para prevenir la adaptación y mantener la motivación.`});
-  else rec.push({t:"ok",i:"✅",msg:`Variedad de métodos correcta: ${uniqueFmts} formatos distintos (${Object.keys(fmtCount).join(", ")}).`});
-
-  if(loadSess>0&&metaSess>0&&Math.abs(loadSess-metaSess)>Math.ceil(totalSess/3))
-    rec.push({t:"warn",i:"⚠️",msg:`Desequilibrio mTOR/AMPK: ${loadSess} sesiones mecánicas vs ${metaSess} metabólicas. Busca una distribución más equilibrada.`});
-  else if(loadSess>0&&metaSess>0)
-    rec.push({t:"ok",i:"✅",msg:`Alternancia mTOR/AMPK equilibrada — ${loadSess} sesiones de carga mecánica + ${metaSess} metabólicas.`});
-
-  if(!(patVol.desplazamientos>0))rec.push({t:"warn",i:"💡",msg:"Sin desplazamientos en el plan. Son clave para la coordinación, estabilidad funcional y transferencia al movimiento real. Añade zancadas, bear crawl o farmer walk."});
-  if(parseFloat(ulRatio)>0&&parseFloat(ulRatio)<0.7)rec.push({t:"warn",i:"⚠️",msg:`Ratio inferior:superior = ${ulRatio}. El tren inferior puede estar infratrabajado. Revisa el balance squat/bisagra.`});
-
-  // ── BUILD HTML ───────────────────────────────────────────────
-
-  // KPIs
-  const kpis=[
-    {v:totalSess,l:"Sesiones",sub:weeksN>1?`en ${weeksN} semanas`:"esta semana",c:"var(--primary)"},
-    {v:freqPerWeek+"×",l:"Frecuencia",sub:"sesiones / semana",c:"#7c3aed"},
-    {v:totalSets,l:"Series Totales",sub:`~${totalReps.toLocaleString()} reps est.`,c:"#dc2626"},
-    {v:avgSetsPerSess,l:"Series / Sesión",sub:"volumen por sesión",c:"#0891b2"},
-    {v:ppRatio,l:"Ratio Tirón:Push",sub:pullTotal>=pushTotal?"✓ Equilibrado":"⚠ Añadir tracción",c:pullTotal>=pushTotal?"#059669":"#d97706"},
-    {v:uniqueFmts,l:"Métodos",sub:"formatos distintos",c:"#0e7490"},
-    {v:avgPats,l:"Patrones/Sesión",sub:"objetivo ≥ 6",c:parseFloat(avgPats)>=5.5?"#059669":"#d97706"},
-    {v:avgRPE==="—"?avgRPE:avgRPE+"/10",l:"RPE Medio",sub:"intensidad percibida",c:"#b45309"},
-  ];
-  const kpiHtml=kpis.map(k=>`<div class="kpi-card"><div class="kpi-val" style="color:${k.c}">${k.v}</div><div class="kpi-lbl">${k.l}</div><div class="kpi-sub">${k.sub}</div></div>`).join("");
-
-  // Load components
-  const loadComps=[
-    {l:"Frecuencia",v:`${freqPerWeek}×/sem`,d:"Sesiones semanales. Mínimo 2 para mantenimiento, 3-5 para progresión."},
-    {l:"Volumen",v:totalSets+" series",d:`~${totalReps.toLocaleString()} reps totales · ${avgSetsPerSess} series/sesión.`},
-    {l:"Intensidad",v:avgRPE==="—"?"Ver mes":avgRPE+"/10 RPE",d:monthData?"RPE promedio del plan mensual.":"Usa el planificador mensual para ver %1RM y RPE."},
-    {l:"Densidad",v:`${loadSess}:${metaSess}`,d:`Mecánico:Metabólico (mTOR:AMPK). Ratio recomendado 1:1 a 2:1.`},
-    {l:"Variedad",v:`${uniqueFmts} métodos`,d:Object.keys(fmtCount).slice(0,3).join(", ")+(uniqueFmts>3?"…":"")},
-    {l:"Duración",v:"50 min",d:"Por sesión. Distribución: 8+7+5+22+8 min."},
-  ];
-  const loadCompHtml=loadComps.map(c=>`<div class="load-comp"><div class="load-comp-lbl">${c.l}</div><div class="load-comp-val">${c.v}</div><div class="load-comp-desc">${c.d}</div></div>`).join("");
-
-  // Pattern bars
-  const maxPatV=Math.max(...Object.values(patVol),1);
-  const patBars=ALL_PATS.map(p=>{
-    const v=patVol[p]||0;
-    const pct=Math.round(v/maxPatV*100);
-    return `<div class="bar-row">
-      <div class="bar-label">${PAT_NAMES_FULL[p]}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${PAT_COLORS[p]}">${v>0?v+" s":""}</div></div>
-      <div class="bar-val" style="color:${PAT_COLORS[p]}">${v}</div>
+  // ── Section 1: Pattern frequency (sessions count) ────────────
+  const patSessCount={};
+  ALL_PATS.forEach(p=>patSessCount[p]=0);
+  sessions.forEach(sess=>{
+    const exs=(sess.blocks&&sess.blocks.fuerza&&sess.blocks.fuerza.exercises)||[];
+    const patsInSess=new Set(exs.map(e=>e.pattern).filter(Boolean));
+    patsInSess.forEach(p=>{patSessCount[p]=(patSessCount[p]||0)+1;});
+  });
+  const totalPatSess=sessions.length||1;
+  const avgPatSessCount=ALL_PATS.reduce((s,p)=>s+patSessCount[p],0)/ALL_PATS.length||0;
+  const sortedPats=[...ALL_PATS].sort((a,b)=>patSessCount[b]-patSessCount[a]);
+  const maxPatSess=Math.max(...ALL_PATS.map(p=>patSessCount[p]),1);
+  const patFreqHtml=sortedPats.map(p=>{
+    const cnt=patSessCount[p];
+    const pct=Math.round(cnt/maxPatSess*100);
+    const isUnder=cnt<avgPatSessCount&&avgPatSessCount>0;
+    const barColor=isUnder?"#f97316":PAT_COLORS[p]||"#64748b";
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="width:120px;font-size:12px;font-weight:600;color:${isUnder?"#f97316":"var(--text)"};flex-shrink:0">${PAT_NAMES_FULL[p]||p}</div>
+      <div style="flex:1;background:#f1f5f9;border-radius:4px;height:10px;position:relative">
+        <div style="width:${pct}%;height:100%;background:${barColor};border-radius:4px"></div>
+      </div>
+      <div style="width:80px;font-size:11px;color:var(--text2);text-align:right;flex-shrink:0">${cnt} sesion${cnt===1?"":"es"}${isUnder?" ⚠":""}  </div>
     </div>`;
   }).join("");
 
-  // Push:Pull stacked bar
-  const ppTotal2=pushTotal+pullTotal||1;
-  const ppPct=Math.round(pushTotal/ppTotal2*100);
-  const ulTotal2=upperTotal+lowerTotal||1;
-  const ulPct=Math.round(upperTotal/ulTotal2*100);
-  const stackedBars=`
-    <div style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px">
-        <span>Empuje vs Tirón</span>
-        <span style="color:${pullTotal>=pushTotal?"#059669":"#d97706"}">${pullTotal>=pushTotal?"✓ OK":"⚠ Déficit"} — ratio ${ppRatio}:1</span>
-      </div>
-      <div style="display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px">
-        <div style="flex:${pushTotal};background:#dc2626;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-width:30px">Emp ${ppPct}%</div>
-        <div style="flex:${pullTotal};background:#1d4ed8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-width:30px">Tir ${100-ppPct}%</div>
-      </div>
+  // ── Section 2: Training method frequency ────────────────────
+  const strFmtCount={};
+  const hiitFmtCount={};
+  sessions.forEach(sess=>{
+    const sid=sess.strFormat||(sess.blocks&&sess.blocks.fuerza&&sess.blocks.fuerza.fmtDef&&sess.blocks.fuerza.fmtDef.id);
+    if(sid){strFmtCount[sid]=(strFmtCount[sid]||0)+1;}
+    const hid=sess.blocks&&sess.blocks.hiit&&sess.blocks.hiit.format&&sess.blocks.hiit.format.id;
+    if(hid){
+      const hname=sess.blocks.hiit.format.name||hid;
+      hiitFmtCount[hname]=(hiitFmtCount[hname]||0)+1;
+    }
+  });
+  function fmtRows(countObj,color){
+    const entries=Object.entries(countObj).sort((a,b)=>b[1]-a[1]);
+    if(!entries.length) return `<div style="font-size:12px;color:var(--text3)">Sin datos</div>`;
+    const max=entries[0][1]||1;
+    return entries.map(([name,cnt])=>{
+      const fmt=STR_FORMATS.find(f=>f.id===name);
+      const label=fmt?fmt.name:name;
+      const pct=Math.round(cnt/max*100);
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div style="width:110px;font-size:12px;font-weight:600;color:var(--text);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${label}">${label}</div>
+        <div style="flex:1;background:#f1f5f9;border-radius:4px;height:8px">
+          <div style="width:${pct}%;height:100%;background:${color};border-radius:4px"></div>
+        </div>
+        <div style="width:30px;font-size:11px;color:var(--text2);text-align:right;flex-shrink:0">${cnt}</div>
+      </div>`;
+    }).join("");
+  }
+  const methodsHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;letter-spacing:.05em">Fuerza</div>
+      ${fmtRows(strFmtCount,"var(--str)")}
     </div>
-    <div style="margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px">
-        <span>Tren Superior vs Inferior</span>
-        <span style="color:var(--text2)">ratio ${ulRatio}:1</span>
-      </div>
-      <div style="display:flex;height:22px;border-radius:6px;overflow:hidden;gap:2px">
-        <div style="flex:${upperTotal};background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-width:30px">Sup ${ulPct}%</div>
-        <div style="flex:${lowerTotal};background:#059669;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;min-width:30px">Inf ${100-ulPct}%</div>
-      </div>
-    </div>`;
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;letter-spacing:.05em">HIIT / Metabólico</div>
+      ${fmtRows(hiitFmtCount,"#7c3aed")}
+    </div>
+  </div>`;
 
-  // Format distribution bars
-  const maxFmt=Math.max(...Object.values(fmtCount),1);
-  const fmtBars=Object.entries(fmtCount).sort((a,b)=>b[1]-a[1]).map(([name,count])=>{
-    const pct=Math.round(count/maxFmt*100);
-    return `<div class="bar-row">
-      <div class="bar-label" style="width:120px">${name}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:#0891b2">${count>1?count+" ses":""}</div></div>
-      <div class="bar-val">${count}</div>
-    </div>`;
-  }).join("");
+  // ── Section 3: Top exercises ─────────────────────────────────
+  const exCount={};
+  const exBlock={};
+  sessions.forEach(sess=>{
+    extractSessionExercises(sess).forEach(({name,block})=>{
+      exCount[name]=(exCount[name]||0)+1;
+      if(!exBlock[name])exBlock[name]=block;
+    });
+  });
+  const BLOCK_COLORS={fuerza:"var(--str)",hiit:"#7c3aed",core:"#d97706",movilidad:"#0891b2",activacion:"#059669",cooldown:"#64748b"};
+  const BLOCK_LABELS={fuerza:"Fuerza",hiit:"HIIT",core:"Core",movilidad:"Movilidad",activacion:"Activación",cooldown:"Cooldown"};
+  const topExs=Object.entries(exCount).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const topExHtml=topExs.length
+    ?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">`+topExs.map(([name,cnt],i)=>{
+        const bl=exBlock[name]||"fuerza";
+        const blColor=BLOCK_COLORS[bl]||"#64748b";
+        const blLabel=BLOCK_LABELS[bl]||bl;
+        return `<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);width:14px;text-align:right;flex-shrink:0">${i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+            <div style="margin-top:1px"><span style="font-size:9px;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:10px;background:${blColor}22;color:${blColor}">${blLabel}</span></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);flex-shrink:0">${cnt}×</div>
+        </div>`;
+      }).join("")+`</div>`
+    :`<div style="font-size:12px;color:var(--text3)">Sin datos</div>`;
 
-  // Muscle group grid
-  const muscleGrid=topMuscles.slice(0,12).map(([name,vol])=>{
-    const pct=Math.round(vol/maxMusVol*100);
-    const patForMuscle=ALL_PATS.find(p=>(PAT_MUSCLES[p]||[]).includes(name))||"total_body";
-    const color=PAT_COLORS[patForMuscle]||"#64748b";
-    return `<div class="muscle-row">
-      <div class="muscle-dot" style="background:${color}"></div>
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span class="muscle-name">${name}</span>
-          <span class="muscle-vol">${vol}<span style="font-size:10px;color:var(--text3)"> s</span></span>
-        </div>
-        <div class="muscle-bar-mini"><div class="muscle-bar-mini-fill" style="width:${pct}%;background:${color}"></div></div>
-      </div>
-    </div>`;
-  }).join("");
-
-  // Weekly strip (if current week exists)
-  let weekStripHtml="";
-  if(window._currentWeek&&window._currentWeek.length){
-    const strips=window._currentWeek.map(d=>{
-      if(d.rest)return `<div class="wds wds-rest"><div class="wds-dow">${d.label}</div><div style="font-size:18px;margin:4px 0">😴</div><div class="wds-fmt">Descanso</div></div>`;
-      const m=computeSessionMetrics(d.sess);
-      const cls=d.st.css==="load"?"wds-load":"wds-meta";
-      return `<div class="wds ${cls}" onclick="openPlanSess(${d.id})" style="cursor:pointer" title="Ver sesión">
-        <div class="wds-dow">${d.label}</div>
-        <div style="font-size:16px;margin:3px 0">${d.st.icon}</div>
-        <div class="wds-name">${d.t.label}</div>
-        <div class="wds-fmt">${m.formatName}</div>
-        <div style="font-size:9px;color:var(--text2);margin-top:3px">${m.patterns.length} pat · ${m.totalSets}s</div>
-      </div>`;
-    }).join("");
-    weekStripHtml=`<div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Vista Semanal <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">(clic en un día para ver la sesión)</span></div>
-      <div class="week-day-strip">${strips}</div>
-    </div>`;
-  }
-
-  // Monthly progression (if current month exists)
-  let monthProgHtml="";
-  if(window._currentMonth&&window._currentMonth.length){
-    const cards=window._currentMonth.map(({phase,days})=>{
-      const trained=days.filter(d=>!d.rest);
-      const fmts=[...new Set(trained.map(d=>d.sess.blocks.fuerza.fmtDef.name))];
-      const totS=trained.map(d=>computeSessionMetrics(d.sess).totalSets).reduce((a,b)=>a+b,0);
-      const avgS=trained.length?Math.round(totS/trained.length):0;
-      return `<div class="mp-week ${phase.badge}">
-        <div class="mp-week-num">Semana ${phase.week}${phase.name.includes("Descarga")?" · Descarga":""}</div>
-        <div class="mp-week-rm">${phase.rm}</div>
-        <div class="mp-rpe-row">RPE ${phase.rpe} · ❤️ ${phase.fcm}</div>
-        <div style="font-size:10px;color:var(--text2);margin-top:6px;line-height:1.4">${trained.length} ses · ~${avgS} s/ses<br>${fmts.slice(0,2).join(" · ")}${fmts.length>2?"…":""}</div>
-      </div>`;
-    }).join("");
-    monthProgHtml=`<div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Progresión Mensual — Periodización</div>
-      <div class="month-progress">${cards}</div>
-    </div>`;
-  }
-
-  // Session list (last 6 sessions from primary source)
-  const sessListHtml=primary.slice(0,8).map((s,i)=>{
-    const m=computeSessionMetrics(s);
-    const d=new Date(s.date);
-    const ds=isNaN(d)?`Sesión ${i+1}`:d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"});
-    const typeColor=s.sessionType==="high_load"?"#dc2626":"#7c3aed";
-    const typeIcon=s.sessionType==="high_load"?"💪":"🔥";
-    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div style="width:36px;height:36px;border-radius:50%;background:${s.sessionType==="high_load"?"#fee2e2":"#ede9fe"};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${typeIcon}</div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-weight:700;font-size:13px">${ds}</span>
-          <span style="font-size:11px;font-weight:600;color:${typeColor}">${m.formatName}</span>
-        </div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${m.patterns.map(p=>PAT_NAMES_FULL[p]||p).join(" · ")}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:13px;font-weight:700;color:var(--text)">${m.totalSets} s</div>
-        <div style="font-size:10px;color:var(--text3)">${m.patterns.length} pat</div>
-      </div>
-    </div>`;
-  }).join("");
-
-  // Recommendations
-  const recHtml=rec.map(r=>`<div class="recomm-item recomm-${r.t}"><div class="recomm-icon">${r.i}</div><div class="recomm-text">${r.msg}</div></div>`).join("");
-
-  // ── Frequency card ───────────────────────────────────────────
-  // Merge all sources: plan sessions + saved history (deduplicate by id/date)
-  const allForFreq=[...primary,...histRaw.filter(h=>!primary.some(p=>p.id===h.id&&p.date===h.date))];
-  const freqCardHtml=buildFrequencyCard(allForFreq);
-
-  // ── MEV/MAV/MRV (computed from muscleVol) ───────────────────
-  const mevMavMrvHtml=(()=>{
-    if(!topMuscles.length) return "";
-    const VOLUME_RANGES={
-      "Pectoral":{mev:8,mav:16,mrv:22},"Deltoides":{mev:8,mav:16,mrv:26},
-      "Tríceps":{mev:6,mav:14,mrv:20},"Bíceps":{mev:8,mav:14,mrv:20},
-      "Dorsal":{mev:8,mav:16,mrv:22},"Trapecio":{mev:10,mav:18,mrv:26},
-      "Isquiotibiales":{mev:6,mav:12,mrv:20},"Glúteos":{mev:8,mav:16,mrv:22},
-      "Cuádriceps":{mev:8,mav:16,mrv:22},"Core":{mev:10,mav:20,mrv:30},
-      "Lumbar":{mev:6,mav:12,mrv:18},"Antebrazo":{mev:4,mav:10,mrv:16},
-      "Trapecio sup.":{mev:10,mav:18,mrv:26},"Romboides":{mev:8,mav:14,mrv:20},
-      "Teres mayor":{mev:6,mav:12,mrv:18},"Deltoides ant.":{mev:8,mav:14,mrv:20},
-      "Potencia":{mev:4,mav:10,mrv:16},"Global":{mev:6,mav:12,mrv:18},
-    };
-    return topMuscles.slice(0,12).map(([muscle,vol])=>{
+  // ── Section 4: Volume per muscle group (FIXED) ───────────────
+  // Count sets per muscle correctly: 1 appearance = setsForFmt sets
+  // Then divide by weeksN for weekly average
+  const VOLUME_RANGES={
+    "Glúteos":        {mev:4,mav:12,mrv:20},
+    "Isquiotibiales": {mev:4,mav:10,mrv:16},
+    "Cuádriceps":     {mev:4,mav:12,mrv:20},
+    "Pectoral":       {mev:4,mav:10,mrv:18},
+    "Dorsal":         {mev:4,mav:12,mrv:20},
+    "Bíceps":         {mev:4,mav:10,mrv:20},
+    "Tríceps":        {mev:4,mav:10,mrv:18},
+    "Deltoides":      {mev:4,mav:12,mrv:22},
+    "Deltoides ant.": {mev:4,mav:8, mrv:14},
+    "Romboides":      {mev:4,mav:10,mrv:16},
+    "Trapecio sup.":  {mev:4,mav:10,mrv:16},
+    "Lumbar":         {mev:4,mav:10,mrv:15},
+    "Core":           {mev:4,mav:12,mrv:20},
+  };
+  const PAT_MUSCLES_FIXED={
+    push_h:    ["Pectoral","Tríceps","Deltoides ant."],
+    push_v:    ["Deltoides","Tríceps","Trapecio sup."],
+    pull_h:    ["Dorsal","Bíceps","Romboides"],
+    pull_v:    ["Dorsal","Bíceps","Trapecio sup."],
+    hinge:     ["Glúteos","Isquiotibiales","Lumbar"],
+    squat:     ["Glúteos","Cuádriceps","Lumbar"],
+    desplazamientos:["Glúteos","Cuádriceps","Isquiotibiales"],
+    total_body:["Glúteos","Pectoral","Dorsal"],
+  };
+  // Accumulate total sets per muscle across the period
+  const muscleTotalSets={};
+  sessions.forEach(sess=>{
+    const exs=(sess.blocks&&sess.blocks.fuerza&&sess.blocks.fuerza.exercises)||[];
+    const fmtId=sess.strFormat||(sess.blocks&&sess.blocks.fuerza&&sess.blocks.fuerza.fmtDef&&sess.blocks.fuerza.fmtDef.id)||"emom";
+    const nSets=setsForFmt(fmtId);
+    exs.forEach(ex=>{
+      const pat=ex.pattern;
+      if(!pat) return;
+      (PAT_MUSCLES_FIXED[pat]||[]).forEach(muscle=>{
+        muscleTotalSets[muscle]=(muscleTotalSets[muscle]||0)+nSets;
+      });
+    });
+  });
+  // Convert to weekly average
+  const muscleWeeklySets={};
+  Object.entries(muscleTotalSets).forEach(([m,tot])=>{
+    muscleWeeklySets[m]=Math.round((tot/weeksN)*10)/10;
+  });
+  // Build the MEV/MAV/MRV bars only for muscles that have defined ranges
+  const mevMavMrvHtml2=(()=>{
+    const musclesWithRanges=Object.keys(VOLUME_RANGES).filter(m=>muscleWeeklySets[m]!==undefined||true);
+    if(!musclesWithRanges.length) return `<div style="font-size:12px;color:var(--text3)">Sin datos suficientes.</div>`;
+    return musclesWithRanges.map(muscle=>{
+      const wvol=muscleWeeklySets[muscle]||0;
       const r=VOLUME_RANGES[muscle];
-      if(!r) return "";
-      const maxBar=r.mrv*1.1;
-      const pct=Math.min(100,Math.round(vol/maxBar*100));
+      const maxBar=r.mrv*1.15;
+      const pct=Math.min(100,Math.round(wvol/maxBar*100));
       const mevPct=Math.round(r.mev/maxBar*100);
       const mavPct=Math.round(r.mav/maxBar*100);
       const mrvPct=Math.round(r.mrv/maxBar*100);
-      const color=vol>r.mrv?"#f87171":vol>r.mav?"#fb923c":vol>=r.mev?"#4ade80":"#94a3b8";
-      const label=vol>r.mrv?"⚠ Sobre MRV":vol>r.mav?"Sobre MAV":vol>=r.mev?"✓ En MAV":"Bajo MEV";
-      return `<div style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-          <span style="font-weight:600">${muscle}</span>
-          <span style="color:${color};font-weight:700">${vol} s — ${label}</span>
+      const color=wvol>r.mrv?"#f87171":wvol>r.mav?"#fb923c":wvol>=r.mev?"#4ade80":"#94a3b8";
+      const label=wvol>r.mrv?"Sobre MRV ⚠":wvol>r.mav?"Sobre MAV":wvol>=r.mev?"En MAV":"Bajo MEV";
+      return `<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;margin-bottom:4px">
+          <span style="font-weight:600;color:var(--text)">${muscle}</span>
+          <span style="color:${color};font-weight:700">${wvol} s/sem &mdash; <span style="font-weight:500">${label}</span></span>
         </div>
         <div style="position:relative;height:10px;background:#f1f5f9;border-radius:5px;overflow:visible">
-          <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${color};border-radius:5px;-webkit-print-color-adjust:exact"></div>
-          <div style="position:absolute;left:${mevPct}%;top:-2px;height:14px;width:2px;background:#94a3b8;border-radius:1px"></div>
-          <div style="position:absolute;left:${mavPct}%;top:-2px;height:14px;width:2px;background:#3b82f6;border-radius:1px"></div>
-          <div style="position:absolute;left:${mrvPct}%;top:-2px;height:14px;width:2px;background:#ef4444;border-radius:1px"></div>
+          <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${color};border-radius:5px;-webkit-print-color-adjust:exact;transition:width .3s"></div>
+          <div style="position:absolute;left:${mevPct}%;top:-3px;height:16px;width:2px;background:#94a3b8;border-radius:1px" title="MEV: ${r.mev}"></div>
+          <div style="position:absolute;left:${mavPct}%;top:-3px;height:16px;width:2px;background:#3b82f6;border-radius:1px" title="MAV: ${r.mav}"></div>
+          <div style="position:absolute;left:${mrvPct}%;top:-3px;height:16px;width:2px;background:#ef4444;border-radius:1px" title="MRV: ${r.mrv}"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:3px;font-size:9px;color:var(--text3)">
+          <span>MEV ${r.mev}</span><span>MAV ${r.mav}</span><span>MRV ${r.mrv}</span>
         </div>
       </div>`;
     }).join("");
-  })();
-
-  // ── Push:Pull imbalance ──────────────────────────────────────
-  const imbalanceHtml=(()=>{
-    const conseWeeks=computeConsecutiveWeeks(histRaw);
-    const deloadNeeded=conseWeeks>=4;
-    const ppStatus=pullTotal>=pushTotal*1.5?"🟢 Óptimo":pullTotal>=pushTotal?"🟡 Aceptable":"🔴 Déficit";
-    return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div style="background:#f8fafc;border-radius:10px;padding:12px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Ratio Tirón:Empuje</div>
-        <div style="font-size:22px;font-weight:900;color:${pullTotal>=pushTotal?"#059669":"#d97706"}">${ppRatio}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${ppStatus} · objetivo ≥ 1.0</div>
-      </div>
-      <div style="background:#f8fafc;border-radius:10px;padding:12px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Semanas Consecutivas</div>
-        <div style="font-size:22px;font-weight:900;color:${deloadNeeded?"#dc2626":"#2b2b2b"}">${conseWeeks}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${deloadNeeded?"⚠️ Deload recomendado":"Sin necesidad de deload aún"}</div>
-      </div>
-    </div>
-    ${deloadNeeded?`<div class="deload-banner">
-      <div style="font-size:22px">🔄</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:13px;margin-bottom:2px">Semana de Descarga Recomendada</div>
-        <div style="font-size:12px;color:var(--text2)">Llevas ${conseWeeks} semanas consecutivas. Reducir la carga un 40-50% durante 7 días mejora la supercompensación y reduce la fatiga acumulada.</div>
-      </div>
-      <button class="btn" style="font-size:12px;background:#fde047;color:#713f12;border:none" onclick="generateDeloadWeek()">Generar Semana Deload</button>
-    </div>`:""}`;
   })();
 
   // ── Assemble ─────────────────────────────────────────────────
   container.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <div style="font-size:12px;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 12px">
-        📊 <strong>${sourceLabel}</strong>
+    ${periodSelectorHtml}
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="dash-section-title">Frecuencia por Patrón de Movimiento
+        <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3);margin-left:6px">sesiones en el período · naranja = patrón infraentrenado</span>
       </div>
-      <button class="btn btn-secondary" style="font-size:12px" onclick="renderDashboard()">🔄 Actualizar</button>
+      ${patFreqHtml}
     </div>
 
     <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Resumen del Plan</div>
-      <div class="dash-kpi-grid">${kpiHtml}</div>
+      <div class="dash-section-title">Métodos de Entrenamiento</div>
+      ${methodsHtml}
     </div>
 
     <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Componentes de la Carga de Entrenamiento</div>
-      <div class="load-comp-grid">${loadCompHtml}</div>
-    </div>
-
-    ${weekStripHtml}
-    ${monthProgHtml}
-
-    <div class="dash-two-col">
-      <div class="card">
-        <div class="dash-section-title">Volumen por Patrón de Movimiento <span style="font-weight:400;text-transform:none">(series)</span></div>
-        ${patBars}
-        <div style="margin-top:14px">
-          <div class="dash-section-title" style="margin-bottom:8px">Balance Muscular</div>
-          ${stackedBars}
-        </div>
+      <div class="dash-section-title">Top 15 Ejercicios
+        <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3);margin-left:6px">todos los bloques · ${sessions.length} sesiones</span>
       </div>
-      <div class="card">
-        <div class="dash-section-title">Volumen por Grupo Muscular</div>
-        <div class="muscle-grid">${muscleGrid}</div>
-        <div style="margin-top:16px">
-          <div class="dash-section-title" style="margin-bottom:8px">Distribución de Métodos</div>
-          ${fmtBars}
-        </div>
-      </div>
+      ${topExHtml}
     </div>
 
     <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Volumen Muscular — MEV · MAV · MRV <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3)">(series/semana · línea gris=MEV · línea azul=MAV)</span></div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap">
+      <div class="dash-section-title">Volumen Muscular — Series/Semana vs MEV · MAV · MRV
+        <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3);margin-left:6px">promedio sobre ${Math.round(weeksN*10)/10} semanas</span>
+      </div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:12px;display:flex;gap:14px;flex-wrap:wrap">
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#4ade80;margin-right:4px;vertical-align:middle"></span>En MAV (óptimo)</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fb923c;margin-right:4px;vertical-align:middle"></span>Sobre MAV</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f87171;margin-right:4px;vertical-align:middle"></span>Sobre MRV ⚠️</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f87171;margin-right:4px;vertical-align:middle"></span>Sobre MRV</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#94a3b8;margin-right:4px;vertical-align:middle"></span>Bajo MEV</span>
+        <span style="color:var(--text3)">| Ticks: <span style="color:#94a3b8">gris=MEV</span> · <span style="color:#3b82f6">azul=MAV</span> · <span style="color:#ef4444">rojo=MRV</span></span>
       </div>
-      ${mevMavMrvHtml||'<div style="color:var(--text3);font-size:12px;padding:8px 0">Sin datos suficientes. Genera y guarda sesiones para ver el análisis muscular.</div>'}
-    </div>
-
-    <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Balance Empuje:Tirón y Fatiga Acumulada</div>
-      ${imbalanceHtml}
-    </div>
-
-    <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Frecuencia de Ejercicios <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--text3)">— repetición por período · 🔴 alta · 🟡 moderada · 🟢 baja</span></div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.5">El generador <strong>prioriza automáticamente</strong> ejercicios no usados en los últimos 7 días para darte variedad. Aquí puedes ver el histórico de repeticiones.</div>
-      ${freqCardHtml}
-    </div>
-
-    <div class="card" style="margin-bottom:12px;margin-top:12px">
-      <div class="dash-section-title">Sesiones del Plan</div>
-      ${sessListHtml}
-    </div>
-
-    <div class="card">
-      <div class="dash-section-title">Recomendaciones del Sistema</div>
-      ${recHtml}
+      ${mevMavMrvHtml2}
     </div>`;
 }
 
@@ -7552,6 +7474,68 @@ window.addEventListener('load', function() {
     }
   });
 });
+
+// ── BACKUP: EXPORT ────────────────────────────────────────────────────────
+function exportBackup(){
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,"0");
+  const stamp=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+  const data={
+    version:1,
+    exportedAt:now.toISOString(),
+    gp_history:JSON.parse(localStorage.getItem("gp_history")||"[]"),
+    activ_db_custom:JSON.parse(localStorage.getItem("activ_db_custom")||"null"),
+    activ_groq_key:localStorage.getItem("activ_groq_key")||"",
+    activ_gemini_key:localStorage.getItem("activ_gemini_key")||""
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`activ_backup_${stamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("✓ Copia de seguridad descargada");
+}
+
+// ── BACKUP: IMPORT ────────────────────────────────────────────────────────
+function importBackup(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file){return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data||data.version!==1||!Array.isArray(data.gp_history)){
+        showToast("❌ Archivo no válido o formato incorrecto");
+        return;
+      }
+      const sesCount=data.gp_history.length;
+      const customCount=data.activ_db_custom
+        ?Object.values(data.activ_db_custom).reduce(function(acc,v){return acc+(Array.isArray(v)?v.length:0);},0)
+        :0;
+
+      // Show confirmation modal
+      const msg=`¿Restaurar copia de seguridad?\n\n• ${sesCount} sesión${sesCount===1?"":"es"} en el historial\n• ${customCount} ejercicio${customCount===1?"":"s"} personalizados\n• Exportada el ${new Date(data.exportedAt).toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit"})}\n\nEsto REEMPLAZARÁ todos los datos actuales.`;
+      if(!confirm(msg)){event.target.value="";return;}
+
+      // Restore data
+      localStorage.setItem("gp_history",JSON.stringify(data.gp_history));
+      if(data.activ_db_custom) localStorage.setItem("activ_db_custom",JSON.stringify(data.activ_db_custom));
+      if(data.activ_groq_key) localStorage.setItem("activ_groq_key",data.activ_groq_key);
+      if(data.activ_gemini_key) localStorage.setItem("activ_gemini_key",data.activ_gemini_key);
+
+      // Re-init
+      if(typeof initCustomDB==="function") initCustomDB();
+      renderHistory();
+      showToast("✓ Copia restaurada — "+sesCount+" sesiones cargadas");
+    } catch(err){
+      showToast("❌ Error al leer el archivo: "+err.message);
+    }
+    event.target.value=""; // reset input so same file can be re-selected
+  };
+  reader.readAsText(file);
+}
 </script>
 
 <!-- Regenerate dropdown (shared, positioned via JS) -->
