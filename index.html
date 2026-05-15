@@ -3843,6 +3843,48 @@ function savePlanSess(id, btnEl){
   if(btnEl){btnEl.textContent="✓ Guardada";btnEl.disabled=true;btnEl.className="hist-saved-btn";}
 }
 
+function saveCurrentMonth(btnEl){
+  const month=window._currentMonth;
+  if(!month||!month.length){showToast("No hay mes planificado");return;}
+  const history=getHistory();
+  let saved=0;
+  month.forEach(function(week){
+    (week.days||[]).filter(function(d){return !d.rest;}).forEach(function(d){
+      const alreadySaved=history.some(function(s){return Math.abs(new Date(s.date)-new Date(d.sess.date))<60000;});
+      if(!alreadySaved){history.push(d.sess);saved++;}
+    });
+  });
+  history.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  localStorage.setItem("gp_history",JSON.stringify(history.slice(0,200)));
+  if(saved>0){
+    showToast(saved+" sesiones guardadas en el historial ✓");
+    if(btnEl){btnEl.textContent="✓ "+saved+" sesiones guardadas";btnEl.disabled=true;btnEl.style.background="#f0fdf4";btnEl.style.borderColor="#86efac";btnEl.style.color="#059669";}
+  } else {
+    showToast("Todas las sesiones ya estaban guardadas");
+    if(btnEl){btnEl.textContent="✓ Ya guardadas";btnEl.disabled=true;}
+  }
+}
+
+function saveMonthWeek(weekIdx,btnEl){
+  const month=window._currentMonth;
+  if(!month||!month[weekIdx]){showToast("Semana no encontrada");return;}
+  const history=getHistory();
+  let saved=0;
+  (month[weekIdx].days||[]).filter(function(d){return !d.rest;}).forEach(function(d){
+    const alreadySaved=history.some(function(s){return Math.abs(new Date(s.date)-new Date(d.sess.date))<60000;});
+    if(!alreadySaved){history.push(d.sess);saved++;}
+  });
+  history.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  localStorage.setItem("gp_history",JSON.stringify(history.slice(0,200)));
+  if(saved>0){
+    showToast("Semana "+(weekIdx+1)+" guardada ("+saved+" sesiones) ✓");
+    if(btnEl){btnEl.textContent="✓ Guardada";btnEl.disabled=true;btnEl.style.background="#f0fdf4";btnEl.style.borderColor="#86efac";btnEl.style.color="#059669";}
+  } else {
+    showToast("Las sesiones de esta semana ya estaban guardadas");
+    if(btnEl){btnEl.textContent="✓ Ya guardada";btnEl.disabled=true;}
+  }
+}
+
 function saveCurrentWeek(btnEl){
   const week=window._currentWeek;
   if(!week||!week.length){showToast("No hay semana planificada");return;}
@@ -4672,7 +4714,7 @@ function renderMonthPlan(weeks,startDate,container){
   const pull=(patCount["Tirón Horizontal"]||0)+(patCount["Tirón Vertical"]||0);
   const lower=(patCount["Bisagra"]||0)+(patCount["Sentadilla / Lunge"]||0);
 
-  const weekCards=weeks.map(({phase,monday,days})=>{
+  const weekCards=weeks.map(({phase,monday,days},wi)=>{
     const mondayStr=monday.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
     const trained=days.filter(d=>!d.rest);
     const dots=days.map(d=>{
@@ -4700,6 +4742,7 @@ function renderMonthPlan(weeks,startDate,container){
           <div>💪 Mecánico: <strong>${loadDays}</strong> &nbsp; 🔥 Metabólico: <strong>${metaDays}</strong></div>
           <div style="margin-top:3px">Formatos: <strong>${fmtList||"—"}</strong></div>
         </div>
+        <button class="btn btn-secondary" style="width:100%;margin-top:10px;font-size:11px" onclick="saveMonthWeek(${wi},this)">💾 Guardar semana ${wi+1}</button>
       </div>
     </div>`;
   }).join("");
@@ -4720,7 +4763,10 @@ function renderMonthPlan(weeks,startDate,container){
   container.innerHTML=`<div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div class="card-title" style="margin:0">Plan mensual desde ${dsStart}</div>
-      <button class="btn btn-secondary" style="font-size:12px" onclick="printMonthSessions(window._currentMonth)">🖨 Imprimir mes completo</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" style="font-size:12px" onclick="saveCurrentMonth(this)">💾 Guardar todo el mes</button>
+        <button class="btn btn-secondary" style="font-size:12px" onclick="printMonthSessions(window._currentMonth)">🖨 Imprimir mes completo</button>
+      </div>
     </div>
     <div class="notice" style="margin-bottom:14px">🖱 Haz clic en cualquier día coloreado para ver la sesión completa generada para ese día.</div>
     <div class="month-grid">${weekCards}</div>
