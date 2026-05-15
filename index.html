@@ -5237,7 +5237,7 @@ function renderDashboard(){
       const mavPct=Math.round(r.mav/maxBar*100);
       const mrvPct=Math.round(r.mrv/maxBar*100);
       const color=wvol>r.mrv?"#f87171":wvol>r.mav?"#fb923c":wvol>=r.mev?"#4ade80":"#94a3b8";
-      const label=wvol>r.mrv?"Sobre MRV ⚠":wvol>r.mav?"Sobre MAV":wvol>=r.mev?"En MAV":"Bajo MEV";
+      const label=wvol>r.mrv?"Sobre Máx. Recuperable ⚠":wvol>r.mav?"Sobre Máx. Adaptativo":wvol>=r.mev?"En zona óptima":"Bajo Mín. Efectivo";
       return `<div style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;margin-bottom:4px">
           <span style="font-weight:600;color:var(--text)">${muscle}</span>
@@ -5245,12 +5245,12 @@ function renderDashboard(){
         </div>
         <div style="position:relative;height:10px;background:#f1f5f9;border-radius:5px;overflow:visible">
           <div style="position:absolute;left:0;top:0;height:100%;width:${pct}%;background:${color};border-radius:5px;-webkit-print-color-adjust:exact;transition:width .3s"></div>
-          <div style="position:absolute;left:${mevPct}%;top:-3px;height:16px;width:2px;background:#94a3b8;border-radius:1px" title="MEV: ${r.mev}"></div>
-          <div style="position:absolute;left:${mavPct}%;top:-3px;height:16px;width:2px;background:#3b82f6;border-radius:1px" title="MAV: ${r.mav}"></div>
-          <div style="position:absolute;left:${mrvPct}%;top:-3px;height:16px;width:2px;background:#ef4444;border-radius:1px" title="MRV: ${r.mrv}"></div>
+          <div style="position:absolute;left:${mevPct}%;top:-3px;height:16px;width:2px;background:#94a3b8;border-radius:1px" title="Mín. Efectivo: ${r.mev} s/sem"></div>
+          <div style="position:absolute;left:${mavPct}%;top:-3px;height:16px;width:2px;background:#3b82f6;border-radius:1px" title="Máx. Adaptativo: ${r.mav} s/sem"></div>
+          <div style="position:absolute;left:${mrvPct}%;top:-3px;height:16px;width:2px;background:#ef4444;border-radius:1px" title="Máx. Recuperable: ${r.mrv} s/sem"></div>
         </div>
         <div style="display:flex;gap:10px;margin-top:3px;font-size:9px;color:var(--text3)">
-          <span>MEV ${r.mev}</span><span>MAV ${r.mav}</span><span>MRV ${r.mrv}</span>
+          <span>Mín. Efectivo ${r.mev}</span><span>Máx. Adaptativo ${r.mav}</span><span>Máx. Recuperable ${r.mrv}</span>
         </div>
       </div>`;
     }).join("");
@@ -5280,15 +5280,15 @@ function renderDashboard(){
     </div>
 
     <div class="card" style="margin-bottom:12px">
-      <div class="dash-section-title">Volumen Muscular — Series/Semana vs MEV · MAV · MRV
-        <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3);margin-left:6px">promedio sobre ${Math.round(weeksN*10)/10} semanas</span>
+      <div class="dash-section-title">Volumen Muscular — Series/Semana
+        <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text3);margin-left:6px">media semanal · ${period==="custom"?`${new Date(window._dashFrom).toLocaleDateString("es-ES",{day:"numeric",month:"short"})} — ${new Date(window._dashTo).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}`:period===0?"todo el historial":period===7?"últimos 7 días":period===14?"últimos 14 días":period===30?"últimos 30 días":period===90?"últimos 3 meses":"últimos 6 meses"}</span>
       </div>
       <div style="font-size:10px;color:var(--text2);margin-bottom:12px;display:flex;gap:14px;flex-wrap:wrap">
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#4ade80;margin-right:4px;vertical-align:middle"></span>En MAV (óptimo)</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fb923c;margin-right:4px;vertical-align:middle"></span>Sobre MAV</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f87171;margin-right:4px;vertical-align:middle"></span>Sobre MRV</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#94a3b8;margin-right:4px;vertical-align:middle"></span>Bajo MEV</span>
-        <span style="color:var(--text3)">| Ticks: <span style="color:#94a3b8">gris=MEV</span> · <span style="color:#3b82f6">azul=MAV</span> · <span style="color:#ef4444">rojo=MRV</span></span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#4ade80;margin-right:4px;vertical-align:middle"></span>Zona óptima</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fb923c;margin-right:4px;vertical-align:middle"></span>Sobre Máx. Adaptativo</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f87171;margin-right:4px;vertical-align:middle"></span>Sobre Máx. Recuperable</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#94a3b8;margin-right:4px;vertical-align:middle"></span>Bajo Mín. Efectivo</span>
+        <span style="color:var(--text3)">| Líneas: <span style="color:#94a3b8">gris=Mín. Efectivo</span> · <span style="color:#3b82f6">azul=Máx. Adaptativo</span> · <span style="color:#ef4444">rojo=Máx. Recuperable</span></span>
       </div>
       ${mevMavMrvHtml2}
     </div>`;
