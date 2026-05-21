@@ -79,6 +79,7 @@ textarea{resize:vertical;min-height:70px}
 .ph-hit .ex-num{background:var(--hit-l);color:var(--hit)}
 .ex-content{flex:1}
 .ex-name{font-weight:600;font-size:14px;margin-bottom:2px}
+.ex-name-es{color:var(--text3);font-size:11px;font-style:italic;font-weight:400}
 .ex-detail{font-size:12px;color:var(--text2);margin-bottom:3px}
 .ex-cues{font-size:11px;color:var(--text3);font-style:italic}
 .pattern-pill{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:1px 6px;border-radius:4px;background:var(--str-l);color:var(--str);margin-right:5px}
@@ -549,6 +550,40 @@ textarea{resize:vertical;min-height:70px}
 .ev-skip-btn:hover{background:#e2e8f0}
 .ev-loading-box{text-align:center;padding:50px 20px;color:var(--text2)}
 .ev-num-badge{background:#7c3aed;color:#fff;border-radius:50%;width:19px;height:19px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+/* ── GROUP / CLASS CARD ─────────────────────────────────────────── */
+.class-card-wrap{border-radius:14px;overflow:hidden;border:2px solid #e2e8f0;margin-top:14px;display:none}
+.class-card-wrap.open{display:block}
+.cc-block{border-bottom:1px solid #e2e8f0}
+.cc-block:last-child{border-bottom:none}
+.cc-block-hdr{display:flex;align-items:center;gap:10px;padding:9px 13px;font-weight:700;font-size:12px}
+.cc-block-time{font-size:10px;font-weight:700;background:rgba(0,0,0,.14);padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.cc-block-body{padding:8px 13px 11px;background:#fff}
+.cc-station{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid #f1f5f9}
+.cc-station:last-child{border-bottom:none}
+.cc-st-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px}
+.cc-st-main{font-size:12px;font-weight:700;color:#0f172a;line-height:1.3}
+.cc-st-pat{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:20px;margin-bottom:2px}
+.cc-st-detail{font-size:10px;color:#64748b;margin-top:1px}
+.cc-st-scales{display:flex;flex-direction:column;gap:3px;align-items:flex-end;min-width:85px}
+.cc-st-harder{font-size:9px;color:#b91c1c;background:#fef2f2;padding:2px 7px;border-radius:20px;font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-st-easier{font-size:9px;color:#059669;background:#f0fdf4;padding:2px 7px;border-radius:20px;font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-rotation-note{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:7px 11px;font-size:10px;color:#475569;margin-top:7px;line-height:1.5}
+.cc-equip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cc-equip-chip{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#374151;display:flex;align-items:center;gap:4px}
+.cc-equip-qty{background:#7c3aed;color:#fff;border-radius:20px;padding:1px 6px;font-size:9px;font-weight:800}
+.cc-group-badge{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border-radius:20px;padding:3px 11px;font-size:11px;font-weight:700;white-space:nowrap}
+.cc-warn{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin:0 0 10px;display:flex;gap:8px;align-items:flex-start}
+.cc-toggle-btn{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid #7c3aed;background:#fff;color:#7c3aed;transition:all .15s;flex-shrink:0}
+.cc-toggle-btn.active{background:#7c3aed;color:#fff}
+.cc-scale-legend{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 10px;font-size:10px;color:#64748b;margin-bottom:10px}
+@media print{
+  .nav-wrap,.nav-tabs,.action-bar,.regen-menu,.edit-mode-banner,.btn,.ph-actions,.cc-toggle-btn{display:none!important}
+  .class-card-wrap{display:block!important;border:none}
+  .cc-block-body{break-inside:avoid}
+  section.tab-panel:not(#tab-sesion){display:none!important}
+  .phase{display:none!important}
+  .class-card-wrap{margin-top:0}
+}
 </style>
 <!-- Firebase SDK (compat for single-file use) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -879,6 +914,10 @@ textarea{resize:vertical;min-height:70px}
           <div class="fg">
             <label>Objetivo específico</label>
             <input id="f-obj-esp" type="text" placeholder="Ej: Mejora movilidad tobillo">
+          </div>
+          <div class="fg">
+            <label>👥 Personas en el grupo</label>
+            <input id="f-group-size" type="number" min="1" max="30" value="8" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:15px;font-weight:700;color:#0f172a;width:100%;box-sizing:border-box">
           </div>
           <div class="fg full">
             <label>Equipamiento disponible</label>
@@ -7125,6 +7164,267 @@ function _generateProgramNote(focus,strFormat,level,histInsights,restr,weekData,
   return parts.filter(Boolean).join(" ");
 }
 
+// ══════════════════════════════════════════════════════════════════
+// GROUP TRAINING SYSTEM
+// ══════════════════════════════════════════════════════════════════
+
+// ── 1. Escalado: variantes más fácil/difícil por patrón ──────────
+function getScaledAlternatives(mainEx, pattern, level, equipment){
+  const pool=(DB.fuerza[pattern]||[]).filter(e=>
+    e.name!==mainEx.name && !isHardBlocked(e) && isCompatible(e,level,equipment)
+  );
+  if(!pool.length) return {easier:null,harder:null};
+  // Easier: bilateral, bodyweight / band / dumbbell
+  const easyPool=pool.filter(e=>!e.unilateral&&(!(e.eq||[]).length||(e.eq||[]).some(q=>['band','dumbbell','cable'].includes(q))));
+  const easier=easyPool.length?rnd(easyPool):(pool.length>1?rnd(pool):null);
+  // Harder: unilateral OR barbell/kettlebell OR advanced
+  const hardPool=pool.filter(e=>(e.unilateral||(e.eq||[]).some(q=>['barbell','kettlebell'].includes(q))||e.level==='advanced')&&e!==easier);
+  const harder=hardPool.length?rnd(hardPool):(pool.filter(e=>e!==easier).length?rnd(pool.filter(e=>e!==easier)):null);
+  return {easier:easier||null, harder:harder||null};
+}
+
+// ── 2. Diseño de estaciones y rotaciones ────────────────────────
+function designStationLayout(exercises, format, groupSize){
+  const n=Math.max(1,exercises.length);
+  const gs=Math.max(1,groupSize||8);
+  const timings={circuit:{w:40,r:20},circuit40:{w:40,r:20},interval_str:{w:40,r:20},
+    interval30:{w:30,r:15},emom:{w:50,r:10},tabata:{w:20,r:10},default:{w:40,r:20}};
+  const t=timings[format]||timings.default;
+  const peoplePerSt=Math.ceil(gs/n);
+  const cycleMin=Math.round((t.w+t.r)*n/60);
+  // Rotation groups labelled A, B, C…
+  const groups=Array.from({length:Math.min(n,gs)},(_,i)=>({
+    label:String.fromCharCode(65+i),
+    startStation:i+1,
+    size:i<gs%n?peoplePerSt:Math.max(1,Math.floor(gs/n))
+  }));
+  return {stationCount:n,peoplePerStation:peoplePerSt,workSec:t.w,restSec:t.r,
+    cycleMin,rounds:3,totalMin:cycleMin*3,groups};
+}
+
+// ── 3. Lista de material necesario ──────────────────────────────
+const _EQ_LABELS={
+  barbell:'Barra olímpica',dumbbell:'Mancuernas (par)',kettlebell:'Kettlebell',
+  band:'Banda elástica',cable:'Polea / Cable',box:'Cajón / Step',
+  trx:'TRX',foam_roller:'Foam Roller',bench:'Banco plano',bosu:'Bosu',
+  fitball:'Fitball',medicine_ball:'Balón medicinal',sandbag:'Sandbag',
+  battle_ropes:'Battle Ropes',slider:'Sliders',jump_rope:'Comba',
+  sled:'Trineo',ladder:'Escalera agilidad',cone:'Conos',
+  cardio_machine:'Máquina cardio',reformer:'Reformer',pads:'Pads',saco:'Saco'
+};
+const _EQ_SHARED=['cable','trx','battle_ropes','sled','cardio_machine'];
+const _EQ_HALF=['foam_roller','ladder','cone','jump_rope'];
+
+function buildEquipmentList(sess, groupSize){
+  const gs=groupSize||8;
+  const counts={};
+  const collect=arr=>(arr||[]).forEach(e=>(e.eq||[]).forEach(q=>{if(q&&q!=='none')counts[q]=(counts[q]||0)+1;}));
+  collect(sess.blocks.movilidad);
+  collect(sess.blocks.activacion);
+  collect(sess.blocks.core);
+  collect(sess.blocks.fuerza?.exercises);
+  collect(sess.blocks.hiit?.exercises);
+  collect(sess.blocks.cooldown);
+  return Object.entries(counts).map(([eq,uses])=>({
+    eq, label:_EQ_LABELS[eq]||eq, uses,
+    needed:_EQ_SHARED.includes(eq)?Math.ceil(gs/3):_EQ_HALF.includes(eq)?Math.ceil(gs/2):gs
+  })).sort((a,b)=>b.uses-a.uses);
+}
+
+// ── 4. Historial de grupo y variedad ────────────────────────────
+const _GRP_KEY='activ_group_history';
+function getGroupHistory(){try{return JSON.parse(localStorage.getItem(_GRP_KEY)||'[]');}catch{return[];}}
+function saveGroupSession(sess, groupSize){
+  const hist=getGroupHistory();
+  hist.unshift({
+    date:sess.date, groupSize:groupSize||8,
+    patterns:(sess.blocks.fuerza?.exercises||[]).map(e=>e.pattern).filter(Boolean),
+    strFormat:sess.blocks.fuerza?.fmtDef?.id,
+    hiitFormat:sess.blocks.hiit?.format?.id,
+    exercises:[...(sess.blocks.fuerza?.exercises||[]),...(sess.blocks.hiit?.exercises||[])].map(e=>e.name)
+  });
+  localStorage.setItem(_GRP_KEY,JSON.stringify(hist.slice(0,120)));
+}
+function getGroupVarietyWarnings(sess){
+  const hist=getGroupHistory().slice(0,5);
+  if(hist.length<2) return [];
+  const warns=[];
+  const fmt=sess.blocks.fuerza?.fmtDef?.id;
+  const fmtCount=hist.slice(0,3).filter(h=>h.strFormat===fmt).length;
+  if(fmtCount>=2) warns.push(`Formato "${fmt}" repetido ${fmtCount} veces en las últimas sesiones — considera variar`);
+  const recentEx=new Set(hist.slice(0,2).flatMap(h=>h.exercises||[]));
+  const repeated=(sess.blocks.fuerza?.exercises||[]).filter(e=>recentEx.has(e.name)).map(e=>e.name);
+  if(repeated.length>=3) warns.push(`${repeated.length} ejercicios de fuerza coinciden con sesiones recientes: ${repeated.slice(0,2).join(', ')}…`);
+  return warns;
+}
+
+// ── 5. Semana coherente: detectar conflicto entre días ──────────
+function checkWeekConflict(sess, daysBefore){
+  // daysBefore: array of recent sessions (sorted newest first)
+  const recent=(daysBefore||[]).slice(0,2);
+  if(!recent.length) return [];
+  const usedPats=new Set(recent.flatMap(s=>(s.blocks?.fuerza?.exercises||[]).map(e=>e.pattern)));
+  const thisPats=(sess.blocks?.fuerza?.exercises||[]).map(e=>e.pattern);
+  const conflict=thisPats.filter(p=>usedPats.has(p)&&p!=='desplazamientos');
+  const conflictGroups=['hinge','squat'].filter(p=>conflict.includes(p));
+  if(conflictGroups.length>=2) return [`Patrón de tren inferior (${conflictGroups.join('+')} ) también en sesión de las últimas 48h — considera cambiar énfasis`];
+  return [];
+}
+
+// ── 6. Render de la Ficha de Clase ──────────────────────────────
+function renderClassCard(sess, groupSize){
+  const gs=groupSize||8;
+  const {movilidad,activacion,core,fuerza,hiit,cooldown}=sess.blocks;
+  const eqList=buildEquipmentList(sess,gs);
+  const stLayout=designStationLayout(fuerza?.exercises||[],fuerza?.fmtDef?.id||'circuit',gs);
+  const varWarns=getGroupVarietyWarnings(sess);
+
+  // Timeline
+  let tSec=0;
+  function fmtT(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+  function blockHdr(bg,color,icon,title,durSec){
+    const s=fmtT(tSec); tSec+=durSec;
+    return `<div class="cc-block-hdr" style="background:${bg};color:${color}">
+      <span class="cc-block-time">${s} – ${fmtT(tSec)}</span>
+      <span style="flex:1">${icon} ${title}</span>
+      <span style="font-size:10px;opacity:.75">${Math.round(durSec/60)} min</span>
+    </div>`;
+  }
+
+  // Simple block (no scaling)
+  function simpleBlock(bg,color,icon,title,durSec,items,numBg,numColor){
+    return `<div class="cc-block">
+      ${blockHdr(bg,color,icon,title,durSec)}
+      <div class="cc-block-body">${(items||[]).map((e,i)=>`<div class="cc-station">
+        <div class="cc-st-num" style="background:${numBg};color:${numColor}">${i+1}</div>
+        <div><div class="cc-st-main">${exDispName(e.name)}</div>
+        <div class="cc-st-detail">${e.corePatternLabel?e.corePatternLabel+' · ':''} ${e.dose||e.duration||''}</div></div>
+        <div></div>
+      </div>`).join('')}</div>
+    </div>`;
+  }
+
+  const movBlock=simpleBlock('#0ea5e9','#0c4a6e','🔵','MOVILIDAD',(movilidad||[]).length*90,movilidad,'#e0f2fe','#0369a1');
+  const actBlock=simpleBlock('#10b981','#064e3b','🟢','ACTIVACIÓN',(activacion||[]).length*75,activacion,'#d1fae5','#059669');
+  const coreBlock=simpleBlock('#f59e0b','#713f12','🟡','CORE · 3 rondas × 30s/10s',8*60,core,'#fef3c7','#b45309');
+
+  // Fuerza block with scaling
+  const strExRows=(fuerza?.exercises||[]).map((e,i)=>{
+    const sc=e._scaled||{};
+    return `<div class="cc-station">
+      <div class="cc-st-num" style="background:#fee2e2;color:#b91c1c">${i+1}</div>
+      <div style="min-width:0">
+        ${e.pattern?`<div class="cc-st-pat">${PATTERN_NAMES[e.pattern]||e.pattern}</div>`:''}
+        <div class="cc-st-main">${exDispName(e.name)}</div>
+        <div class="cc-st-detail">${e.circuitReps||''}</div>
+      </div>
+      <div class="cc-st-scales">
+        ${sc.harder?`<span class="cc-st-harder">★ ${exDispName(sc.harder.name)}</span>`:''}
+        ${sc.easier?`<span class="cc-st-easier">☆ ${exDispName(sc.easier.name)}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  const strDurSec=fuerza?.fmtDef?.time?parseInt(fuerza.fmtDef.time)*60:20*60;
+  const strBlock=`<div class="cc-block">
+    ${blockHdr('#ef4444','#fff','🔴',`FUERZA · ${fuerza?.fmtDef?.name||''}`,strDurSec)}
+    <div class="cc-block-body">
+      ${strExRows}
+      <div class="cc-rotation-note">
+        🔄 <strong>${gs} personas · ${stLayout.stationCount} estaciones · ${stLayout.peoplePerStation}/estación</strong>
+        &nbsp;·&nbsp; ${stLayout.workSec}s trabajo + ${stLayout.restSec}s transición
+        &nbsp;·&nbsp; ${stLayout.rounds} rondas (~${stLayout.totalMin} min)
+        <br>Grupos: ${stLayout.groups.map(g=>`<strong>${g.label}</strong> (${g.size}p) → Est.${g.startStation}`).join(' · ')}
+      </div>
+    </div>
+  </div>`;
+
+  // HIIT block
+  const hiitExRows=(hiit?.exercises||[]).map((e,i)=>`<div class="cc-station">
+    <div class="cc-st-num" style="background:#ede9fe;color:#6d28d9">${i+1}</div>
+    <div><div class="cc-st-main">${exDispName(e.name)}</div><div class="cc-st-detail">${e.duration||''}</div></div>
+    <div></div>
+  </div>`).join('');
+  const hiitDurSec=hiit?.fmt?.time?parseInt(hiit.fmt.time)*60:10*60;
+  const hiitBlock=`<div class="cc-block">
+    ${blockHdr('#7c3aed','#fff','🟣',`HIIT · ${hiit?.fmt?.name||''}`,hiitDurSec)}
+    <div class="cc-block-body">${hiitExRows}</div>
+  </div>`;
+
+  const coolBlock=simpleBlock('#10b981','#064e3b','🟢','VUELTA A LA CALMA',6*60,cooldown,'#d1fae5','#059669');
+
+  // Equipment block
+  const eqBlock=eqList.length?`<div class="cc-block">
+    <div class="cc-block-hdr" style="background:#f1f5f9;color:#334155">
+      <span style="flex:1">📦 MATERIAL NECESARIO · ${gs} personas</span>
+    </div>
+    <div class="cc-block-body">
+      <div class="cc-equip-list">
+        ${eqList.map(e=>`<span class="cc-equip-chip">${e.label}<span class="cc-equip-qty">×${e.needed}</span></span>`).join('')}
+      </div>
+    </div>
+  </div>`:'';
+
+  const totalMin=Math.round(tSec/60);
+  return `<div class="class-card-wrap open" id="class-card-content">
+    <div style="background:linear-gradient(135deg,#1e1b4b,#312e81);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#fff">📋 Ficha de Clase</div>
+        <div style="font-size:11px;color:#c7d2fe;margin-top:2px">${new Date(sess.date).toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})} · ${totalMin} min</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <span class="cc-group-badge">👥 ${gs} personas</span>
+        <button onclick="window.print()" style="padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff">🖨️ Imprimir</button>
+      </div>
+    </div>
+    ${varWarns.length?varWarns.map(w=>`<div class="cc-warn">⚠️ <span>${w}</span></div>`).join(''):''}
+    <div class="cc-scale-legend" style="margin:8px 10px 0;border-radius:8px">
+      <strong>★ Nivel alto</strong> = variante más exigente &nbsp;·&nbsp; <strong>☆ Nivel bajo</strong> = variante accesible &nbsp;·&nbsp; Asigna según nivel de cada persona
+    </div>
+    ${movBlock}${actBlock}${coreBlock}${strBlock}${hiitBlock}${coolBlock}${eqBlock}
+  </div>`;
+}
+
+function toggleClassCard(btn){
+  const card=document.getElementById('class-card-content');
+  const isOpen=btn.classList.contains('active');
+  btn.classList.toggle('active',!isOpen);
+  btn.textContent=isOpen?'📋 Ficha de Clase':'✕ Cerrar Ficha';
+  if(card){card.classList.toggle('open',!isOpen);}
+}
+
+// ── Mobility area classifier ─────────────────────────────────────────────────
+// Returns: 'hombro' | 'dorsal' | 'cadera' | 'tobillo' | 'global'
+function getMobArea(ex){
+  const n=(ex.name+' '+(ex.cues||'')).toLowerCase();
+  // Tobillo
+  if(/tobillo|ankle|dorsiflexi[oó]n|flexi[oó]n plantar|inversi[oó]n|eversi[oó]n|intrínse[ca].*pie|intrin.*pie|musculatura.*pie/.test(n)) return 'tobillo';
+  // Hombro — rotación interna/externa sin contexto de cadera/torso = hombro
+  if(/hombro|shoulder|puppy|manguito|glenohumeral|escapul|scapul|arm rotation|rotaciones de brazo|external rotation|internal rotation|mini.?band.*shoulder|band.*shoulder|shoulder.*band|muñeca|wrist|elbow rotation|codo|dowel wrist/.test(n)) return 'hombro';
+  if(/rotaci[oó]n (interna|externa)/.test(n)&&!/cadera|hip|torso|tronco|tor[aá]cic/.test(n)) return 'hombro';
+  // Dorsal / torácica
+  if(/tor[aá]cic|thoracic|torso.?rotat|rotaci[oó]n.*torso|rotaci[oó]n.*tronco|cat.?cow|gato.?camello|gato.?vaca|extensi[oó]n.*tronco|tronco.*rulo|foam.?roller|rulo|t.spine|landmine.*torso|dowel.*thoracic|band torso|columna|spine/.test(n)) return 'dorsal';
+  // Cadera
+  if(/cadera|hip|90.?90|pigeon|paloma|frog|rana|psoas|flexor.*cadera|hip.*rotat|donkey|clamshell|groin|adductor|spiderman.*lunge|lunge.*stretch|sentadilla profunda|deep squat|squat.*hold|piriforme|piriform|hip.?switch|hip.?open|hip.?circle/.test(n)) return 'cadera';
+  return 'global';
+}
+
+// Picks 1 exercise per mobility area (hombro, dorsal, cadera, tobillo)
+// Falls back to global exercises if an area pool is empty
+function pickMobilidad(level, equipment, recentNames){
+  const areas=['hombro','dorsal','cadera','tobillo'];
+  const used=new Set();
+  const result=[];
+  for(const area of areas){
+    // Prefer area-specific, fall back to global
+    const specificPool=DB.movilidad.filter(e=>getMobArea(e)===area);
+    const globalPool=DB.movilidad.filter(e=>getMobArea(e)==='global');
+    const pool=specificPool.length>0?specificPool:globalPool;
+    const ex=pickFrom(pool,level,equipment,used,recentNames);
+    if(ex){result.push({...ex,_mobArea:area});used.add(ex.name);}
+  }
+  return result;
+}
+
 function generateSession(params){
   const {trainer,client,level,equipment,focus,strFormat,hiitFormat,notes,
          sesNum,mesPrograma,semPrograma,objGen,objEsp}=params;
@@ -7148,8 +7448,8 @@ function generateSession(params){
   // Get recently used exercises (last 7 days) to maximise variety
   const recentNames=getRecentExerciseNames(7);
 
-  // 1. Movilidad
-  const movilidad=pickN(DB.movilidad,4,level,equipment,recentNames);
+  // 1. Movilidad — 1 ejercicio por área: hombro, dorsal, cadera, tobillo
+  const movilidad=pickMobilidad(level,equipment,recentNames);
 
   // 2. Core — 1 ejercicio por cada uno de los 4 patrones de McGill
   // (pickFrom ya respeta isBlockedByNotes que incluye noSupine/noProne)
@@ -7175,6 +7475,12 @@ function generateSession(params){
     resolvedStrFormat=rnd(activeMonth.strFormats);
   }
   const fuerza=buildStrengthBlock(resolvedFocus,level,equipment,resolvedStrFormat,undefined,recentNames,weekData,_fiveWeek);
+  // Add scaled alternatives for group class card
+  const _groupSize=params.groupSize||8;
+  fuerza.exercises=fuerza.exercises.map(e=>{
+    if(e.pattern){const sc=getScaledAlternatives(e,e.pattern,level,equipment);return {...e,_scaled:sc};}
+    return e;
+  });
 
   // 5. HIIT ─────────────────────────────────────────────────────────────────
   let resolvedHiit;
@@ -7230,6 +7536,7 @@ function generateSession(params){
     objGen:objGen||"Aumento niveles de fuerza",
     objEsp:objEsp||"",
     sesProfile:_sesProfile,
+    groupSize:_groupSize,
     blocks:{movilidad,core,activacion,fuerza,hiit,cooldown:cooldownArr}
   };
 }
@@ -7520,10 +7827,14 @@ function renderSession(sess){
         <button class="ex-remove-btn" onclick="removeExFromBlock('${phaseKey}',${i})" title="Eliminar ejercicio">✕</button>
       </div>`;
     }
+    const _mobAreaLabels={hombro:'🔵 Hombro',dorsal:'🟢 Dorsal',cadera:'🟠 Cadera',tobillo:'🟡 Tobillo',global:'⚪ Global'};
+    const _mobAreaColors={hombro:'#dbeafe',dorsal:'#dcfce7',cadera:'#ffedd5',tobillo:'#fef9c3',global:'#f1f5f9'};
+    const _mobAreaText={hombro:'#1d4ed8',dorsal:'#15803d',cadera:'#c2410c',tobillo:'#a16207',global:'#64748b'};
+    const mobPill=e._mobArea?`<span style="display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:20px;background:${_mobAreaColors[e._mobArea]||'#f1f5f9'};color:${_mobAreaText[e._mobArea]||'#64748b'};margin-bottom:3px">${_mobAreaLabels[e._mobArea]||''}</span><br>`:"";
     return `<div class="ex-item">
       <div class="ex-num">${i+1}</div>
       <div class="ex-content">
-        ${corePill}<div class="ex-name">${e.name}</div>
+        ${mobPill}${corePill}<div class="ex-name">${exDispName(e.name)}</div>
         ${detail?`<div class="ex-detail">${detail}</div>`:""}
         ${e.cues?`<div class="ex-cues">${e.cues}</div>`:""}
       </div>
@@ -7663,7 +7974,7 @@ function renderSession(sess){
       <div class="ex-num ph-str" style="background:#eff6ff;color:#1d4ed8;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
       <div class="ex-content" style="flex:1">
         <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-        ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${e.name}</div>`)}
+        ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}</div>`)}
         ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
         ${_strInEdit?`<textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i}.cues" placeholder="Consejos...">${e.cues||""}</textarea>`:(e.cues?`<div class="ex-cues">${e.cues}</div>`:"")}
       </div>
@@ -7689,7 +8000,7 @@ function renderSession(sess){
       <div class="ex-num ph-str" style="background:#f5f3ff;color:#6d28d9;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
       <div class="ex-content" style="flex:1">
         <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-        ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${e.name}</div>`)}
+        ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}</div>`)}
         ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
         ${_strInEdit?`<textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i}.cues" placeholder="Consejos...">${e.cues||""}</textarea>`:(e.cues?`<div class="ex-cues">${e.cues}</div>`:"")}
       </div>
@@ -7713,7 +8024,7 @@ function renderSession(sess){
         <div class="ex-content" style="flex:1">
           <div style="display:flex;align-items:center;gap:8px">
             <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-            ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}" style="display:inline-block;width:auto;flex:1">`:(`<span class="ex-name" style="font-size:14px">${e.name}</span>`)}
+            ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}" style="display:inline-block;width:auto;flex:1">`:(`<span class="ex-name" style="font-size:14px">${exDispName(e.name)}</span>`)}
           </div>
           ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
           ${_strInEdit?`<textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i}.cues" placeholder="Consejos...">${e.cues||""}</textarea>`:(e.cues?`<div class="ex-cues">${e.cues}</div>`:"")}
@@ -7731,12 +8042,12 @@ function renderSession(sess){
         </div>
         <div class="ex-item" style="margin-bottom:4px;position:relative">
           <div class="ex-num ph-str" style="background:var(--str-l);color:var(--str);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">A</div>
-          <div class="ex-content" style="flex:1"><span class="pattern-pill">${PATTERN_NAMES[a.pattern]||a.pattern}</span>${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(a.name||"").replace(/"/g,"&quot;")}"><input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(a.circuitReps||"").replace(/"/g,"&quot;")}"><textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i}.cues" placeholder="Consejos...">${a.cues||""}</textarea>`:(`<div class="ex-name">${a.name}</div><div class="ex-detail">${a.circuitReps}</div>${a.cues?`<div class="ex-cues">${a.cues}</div>`:""}`)}</div>
+          <div class="ex-content" style="flex:1"><span class="pattern-pill">${PATTERN_NAMES[a.pattern]||a.pattern}</span>${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(a.name||"").replace(/"/g,"&quot;")}"><input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(a.circuitReps||"").replace(/"/g,"&quot;")}"><textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i}.cues" placeholder="Consejos...">${a.cues||""}</textarea>`:(`<div class="ex-name">${exDispName(a.name)}</div><div class="ex-detail">${a.circuitReps}</div>${a.cues?`<div class="ex-cues">${a.cues}</div>`:""}`)}</div>
           ${_strInEdit?`<button class="ex-remove-btn" onclick="removeExFromBlock('fuerza',${i})" title="Eliminar ejercicio">✕</button>`:""}
         </div>
         ${b?`<div class="ex-item" style="position:relative">
           <div class="ex-num ph-str" style="background:var(--str-l);color:var(--str);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">B</div>
-          <div class="ex-content" style="flex:1"><span class="pattern-pill">${PATTERN_NAMES[b.pattern]||b.pattern}</span>${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i+1}.name" value="${(b.name||"").replace(/"/g,"&quot;")}"><input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i+1}.circuitReps" value="${(b.circuitReps||"").replace(/"/g,"&quot;")}"><textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i+1}.cues" placeholder="Consejos...">${b.cues||""}</textarea>`:(`<div class="ex-name">${b.name}</div><div class="ex-detail">${b.circuitReps}</div>${b.cues?`<div class="ex-cues">${b.cues}</div>`:""}`)}</div>
+          <div class="ex-content" style="flex:1"><span class="pattern-pill">${PATTERN_NAMES[b.pattern]||b.pattern}</span>${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i+1}.name" value="${(b.name||"").replace(/"/g,"&quot;")}"><input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i+1}.circuitReps" value="${(b.circuitReps||"").replace(/"/g,"&quot;")}"><textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${i+1}.cues" placeholder="Consejos...">${b.cues||""}</textarea>`:(`<div class="ex-name">${exDispName(b.name)}</div><div class="ex-detail">${b.circuitReps}</div>${b.cues?`<div class="ex-cues">${b.cues}</div>`:""}`)}</div>
           ${_strInEdit?`<button class="ex-remove-btn" onclick="removeExFromBlock('fuerza',${i+1})" title="Eliminar ejercicio">✕</button>`:""}
         </div>`:""}
       </div>`);
@@ -7752,7 +8063,7 @@ function renderSession(sess){
         <div class="ex-num ph-str" style="background:${amrapBgs[gi]};color:${amrapColors[gi]};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
         <div class="ex-content" style="flex:1">
           <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${gi*3+i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${e.name}</div>`)}
+          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${gi*3+i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}</div>`)}
           ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${gi*3+i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
           ${_strInEdit?`<textarea class="edit-input edit-cues-input" data-edit-path="fuerza.exercises.${gi*3+i}.cues" placeholder="Consejos...">${e.cues||""}</textarea>`:(e.cues?`<div class="ex-cues">${e.cues}</div>`:"")}
         </div>
@@ -7785,7 +8096,7 @@ function renderSession(sess){
         <div class="ex-num ph-str" style="background:var(--str-l);color:var(--str);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
         <div class="ex-content" style="flex:1">
           <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${e.name}</div>`)}
+          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}</div>`)}
           ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
           ${enrichedBadges?`<div style="margin-top:3px">${enrichedBadges}</div>`:""}
           ${progReg}
@@ -7826,7 +8137,7 @@ function renderSession(sess){
       ${_hiitInEdit
         ?`<input class="edit-input" data-edit-path="hiit.exercises.${i}.name" value="${(e.name||"").replace(/"/g,'&quot;')}">
            <input class="edit-input edit-detail-input" data-edit-path="hiit.exercises.${i}.dose" value="${(e.dose||"").replace(/"/g,'&quot;')}" placeholder="Dosis / protocolo">`
-        :`<div class="ex-name">${e.name}</div>${e.dose?`<div class="ex-detail">${e.dose}</div>`:""}`}
+        :`<div class="ex-name">${exDispName(e.name)}</div>${e.dose?`<div class="ex-detail">${e.dose}</div>`:""}`}
     </div>
     ${_hiitInEdit?`<button class="ex-remove-btn" onclick="removeExFromBlock('hiit',${i})" title="Eliminar ejercicio">✕</button>`:""}
   </div>`).join("");
@@ -7849,6 +8160,7 @@ function renderSession(sess){
         <div class="sess-meta-item">📅 <strong>${dateStr}</strong></div>
         <div class="sess-meta-item">📊 <strong>${LEVEL_NAMES[sess.level]}</strong></div>
         <div class="sess-meta-item">⏱ <strong>50 min</strong></div>
+        ${(sess.groupSize||8)>1?`<div class="sess-meta-item">👥 Grupo: <strong>${sess.groupSize} personas</strong></div>`:''}
       </div>
       ${sess.notes?`<div style="margin-top:10px;font-size:13px;color:#94a3b8">📝 ${sess.notes}</div>`:""}
     </div>
@@ -7885,6 +8197,7 @@ function renderSession(sess){
       </div>
       <button class="btn btn-secondary" onclick="toggleEditMode()">✏️ Editar todo</button>
       <button class="btn btn-secondary" onclick="openDownloadModal()">⬇️ Descargar</button>
+      <button class="cc-toggle-btn" id="cc-toggle-btn" onclick="toggleClassCard(this)">📋 Ficha de Clase</button>
     </div>`}
 
     ${programmingCard}
@@ -7898,6 +8211,7 @@ function renderSession(sess){
       (sess.blocks.cooldown||[]).map((e,i)=>exItem(e,i,"ph-cool","cooldown")).join("")+
       ((window._editMode&&(!window._editSectionFilter||window._editSectionFilter==="cooldown"))?`<div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('cooldown')">+ Añadir ejercicio</button></div>`:"")
     ,"cooldown")}
+    ${renderClassCard(sess, sess.groupSize||8)}
   `;
 
   document.getElementById("session-output").innerHTML=html;
@@ -8184,6 +8498,7 @@ function onGenerate(){
     semPrograma:1,
     objGen:document.getElementById("f-obj-gen").value,
     objEsp:document.getElementById("f-obj-esp").value.trim(),
+    groupSize:parseInt((document.getElementById("f-group-size")||{}).value)||8,
     equipment
   };
 
@@ -8198,6 +8513,7 @@ function onGenerate(){
 
   const sess=generateSession(params);
   renderSession(sess);
+  saveGroupSession(sess, params.groupSize);
   showTab("sesion");
 
   let restricts=[];
@@ -8676,7 +8992,658 @@ const EXERCISE_ES = {
   "Y en Polea / Banda":"Elevación en Y (Polea / Banda)",
   "Z Press con Barra":"Press Z con Barra (suelo)",
   "Z Press con Mancuerna a una mano":"Press Z Unilateral con Mancuerna",
+  // CloudFit imports — movimientos con nombre propio / difícil traducción automática
+  "Alternating Bent Over Dumbbell Row":"Remo Inclinado Alternado con Mancuerna",
+  "Alternate Bent Over Dumbbell Row":"Remo Inclinado Alternado con Mancuerna",
+  "Barbell Romanian Deadlift":"Peso Muerto Rumano con Barra",
+  "Dumbbell Romanian Deadlift":"Peso Muerto Rumano con Mancuerna",
+  "Single Leg Romanian Deadlift":"Peso Muerto Rumano Unilateral",
+  "Single Leg Dumbbell Romanian Deadlift":"Peso Muerto Rumano Unilateral con Mancuerna",
+  "Barbell Back Squat":"Sentadilla Trasera con Barra",
+  "Barbell Front Squat":"Sentadilla Frontal con Barra",
+  "Barbell Overhead Press":"Press Sobre la Cabeza con Barra",
+  "Dumbbell Overhead Press":"Press Sobre la Cabeza con Mancuerna",
+  "Dumbbell Shoulder Press":"Press de Hombros con Mancuerna",
+  "Dumbbell Bench Press":"Press de Banca con Mancuerna",
+  "Dumbbell Incline Bench Press":"Press de Banca Inclinado con Mancuerna",
+  "Dumbbell Walking Lunge":"Zancada Caminando con Mancuerna",
+  "Dumbbell Reverse Lunge":"Zancada Inversa con Mancuerna",
+  "Dumbbell Lateral Lunge":"Zancada Lateral con Mancuerna",
+  "Dumbbell Goblet Squat":"Sentadilla Goblet con Mancuerna",
+  "Dumbbell Split Squat":"Sentadilla Dividida con Mancuerna",
+  "Dumbbell Sumo Squat":"Sentadilla Sumo con Mancuerna",
+  "Dumbbell Step Up":"Subida al Step con Mancuerna",
+  "Dumbbell Deadlift":"Peso Muerto con Mancuerna",
+  "Dumbbell Sumo Deadlift":"Peso Muerto Sumo con Mancuerna",
+  "Dumbbell Single Leg Deadlift":"Peso Muerto Unilateral con Mancuerna",
+  "Dumbbell Bicep Curl":"Curl de Bíceps con Mancuerna",
+  "Dumbbell Hammer Curl":"Curl Martillo con Mancuerna",
+  "Dumbbell Lateral Raise":"Elevación Lateral con Mancuerna",
+  "Dumbbell Front Raise":"Elevación Frontal con Mancuerna",
+  "Dumbbell Bent Over Row":"Remo Inclinado con Mancuerna",
+  "Dumbbell Single Arm Row":"Remo Unilateral con Mancuerna",
+  "Dumbbell Chest Fly":"Apertura de Pecho con Mancuerna",
+  "Dumbbell Tricep Extension":"Extensión de Tríceps con Mancuerna",
+  "Dumbbell Hip Thrust":"Empuje de Cadera con Mancuerna",
+  "Dumbbell Glute Bridge":"Puente de Glúteos con Mancuerna",
+  "Dumbbell Calf Raise":"Elevación de Talones con Mancuerna",
+  "Barbell Bent Over Row":"Remo Inclinado con Barra",
+  "Barbell Hip Thrust":"Empuje de Cadera con Barra",
+  "Barbell Glute Bridge":"Puente de Glúteos con Barra",
+  "Barbell Deadlift":"Peso Muerto con Barra",
+  "Barbell Sumo Deadlift":"Peso Muerto Sumo con Barra",
+  "Barbell Bicep Curl":"Curl de Bíceps con Barra",
+  "Barbell Lunge":"Zancada con Barra",
+  "Barbell Reverse Lunge":"Zancada Inversa con Barra",
+  "Barbell Step Up":"Subida al Step con Barra",
+  "Barbell Calf Raise":"Elevación de Talones con Barra",
+  "Kettlebell Swing":"Balanceo con Kettlebell",
+  "Kettlebell Goblet Squat":"Sentadilla Goblet con Kettlebell",
+  "Kettlebell Romanian Deadlift":"Peso Muerto Rumano con Kettlebell",
+  "Kettlebell Deadlift":"Peso Muerto con Kettlebell",
+  "Kettlebell Hip Thrust":"Empuje de Cadera con Kettlebell",
+  "Kettlebell Press":"Press con Kettlebell",
+  "Kettlebell Row":"Remo con Kettlebell",
+  "Kettlebell Lunge":"Zancada con Kettlebell",
+  "Kettlebell Sumo Deadlift":"Peso Muerto Sumo con Kettlebell",
+  "Cable Pull Through":"Tirón en Polea (cadera)",
+  "Cable Romanian Deadlift":"Peso Muerto Rumano en Polea",
+  "Cable Hip Thrust":"Empuje de Cadera en Polea",
+  "Cable Bicep Curl":"Curl de Bíceps en Polea",
+  "Cable Lateral Raise":"Elevación Lateral en Polea",
+  "Cable Front Raise":"Elevación Frontal en Polea",
+  "Cable Tricep Extension":"Extensión de Tríceps en Polea",
+  "Cable Tricep Pushdown":"Jalón de Tríceps en Polea",
+  "Cable Face Pull":"Tirón a la Cara en Polea",
+  "Cable Chest Fly":"Apertura de Pecho en Polea",
+  "Cable Crossover":"Cruce de Poleas",
+  "Cable Row":"Remo en Polea",
+  "Cable Seated Row":"Remo Sentado en Polea",
+  "Cable Lat Pulldown":"Jalón al Pecho en Polea",
+  "Cable Overhead Tricep Extension":"Extensión de Tríceps Sobre la Cabeza en Polea",
+  "Cable Woodchop":"Leñador en Polea",
+  "Lat Pulldown":"Jalón al Pecho",
+  "Seated Cable Row":"Remo Sentado en Polea",
+  "Chest Supported Row":"Remo en Banco (apoyo pecho)",
+  "Incline Dumbbell Row":"Remo Inclinado en Banco con Mancuerna",
+  "Incline Dumbbell Press":"Press Inclinado con Mancuerna",
+  "Incline Dumbbell Curl":"Curl Inclinado con Mancuerna",
+  "Nordic Hamstring Curl":"Curl Nórdico de Isquiotibiales",
+  "Nordic Curl":"Curl Nórdico",
+  "Copenhagen Adduction":"Aducción de Copenhague",
+  "Wall Sit":"Sentadilla en Pared Isométrica",
+  "Sissy Squat":"Sentadilla Sissy",
+  "Bulgarian Split Squat":"Sentadilla Búlgara",
+  "Bulgarian Split Squat with Dumbbell":"Sentadilla Búlgara con Mancuerna",
+  "Barbell Bulgarian Split Squat":"Sentadilla Búlgara con Barra",
+  "Sumo Deadlift High Pull":"Peso Muerto Sumo con Tirón Alto",
+  "Hang Power Clean":"Cargada de Potencia en Suspensión",
+  "Power Snatch":"Arrancada de Potencia",
+  "Overhead Squat":"Sentadilla con Barra en Alto",
+  "Zercher Squat":"Sentadilla Zercher",
+  "Hack Squat":"Sentadilla Hack",
+  "Box Squat":"Sentadilla en Cajón",
+  "Pause Squat":"Sentadilla con Pausa",
+  "High Bar Back Squat":"Sentadilla Trasera Barra Alta",
+  "Low Bar Back Squat":"Sentadilla Trasera Barra Baja",
+  "Safety Bar Squat":"Sentadilla con Barra Safety",
+  "Trap Bar Deadlift":"Peso Muerto con Barra Hexagonal",
+  "Romanian Deadlift":"Peso Muerto Rumano",
+  "Stiff Leg Deadlift":"Peso Muerto Pierna Rígida",
+  "Single Leg Hip Thrust":"Empuje de Cadera Unilateral",
+  "Banded Hip Thrust":"Empuje de Cadera con Banda",
+  "Frog Pump":"Bomba de Rana (glúteos)",
+  "Glute Kickback":"Patada de Glúteo",
+  "Cable Kickback":"Patada de Glúteo en Polea",
+  "Donkey Kick":"Patada de Burro",
+  "Fire Hydrant":"Apertura de Cadera (hidrante)",
+  "Clamshell":"Ejercicio de Almeja",
+  "Standing Hip Abduction":"Abducción de Cadera de Pie",
+  "Seated Hip Abduction":"Abducción de Cadera Sentado",
+  "Standing Hip Adduction":"Aducción de Cadera de Pie",
+  "Monster Walk":"Caminar del Monstruo",
+  "Lateral Band Walk":"Caminar Lateral con Banda",
+  "Forward Band Walk":"Caminar Frontal con Banda",
+  "Calf Raise":"Elevación de Talones",
+  "Standing Calf Raise":"Elevación de Talones de Pie",
+  "Seated Calf Raise":"Elevación de Talones Sentado",
+  "Face Pull":"Tirón a la Cara",
+  "Band Pull-Apart":"Separación de Banda",
+  "Prone Cobra":"Cobra Prona",
+  "Y Raise":"Elevación en Y",
+  "T Raise":"Elevación en T",
+  "W Raise":"Elevación en W",
+  "I Y T Raise":"Elevaciones I-Y-T",
+  "Dumbbell Arnold Press":"Press Arnold con Mancuerna",
+  "Z Press":"Press Z",
+  "Landmine Press":"Press con Landmine",
+  "Landmine Row":"Remo con Landmine",
+  "Landmine Squat":"Sentadilla con Landmine",
+  "Pallof Press":"Press Pallof (antirotación)",
+  "Chop":"Leñador",
+  "Lift":"Elevación Diagonal",
+  "Woodchop":"Leñador",
+  "Anti Rotation Press":"Press Antirotación",
+  "Stir The Pot":"Remover la Olla",
+  "Ab Wheel":"Rueda Abdominal",
+  "Ab Rollout":"Rodamiento Abdominal",
+  "Dragon Flag":"Bandera (Dragon Flag)",
+  "Hanging Leg Raise":"Elevación de Piernas Colgado",
+  "Hanging Knee Raise":"Elevación de Rodillas Colgado",
+  "Toes To Bar":"Pies a la Barra",
+  "Knees To Elbows":"Rodillas a los Codos",
+  "L Sit":"Posición en L",
+  "Pike":"Posición de Pica",
+  "Hollow Rock":"Balanceo en Posición Hueca",
+  "Hollow Hold":"Aguante en Posición Hueca",
+  "Superman Hold":"Aguante Superman",
+  "Back Extension":"Extensión Lumbar",
+  "Glute Ham Raise":"Curl de Isquiotibiales (GHD)",
+  "Good Morning":"Buenos Días (flexión cadera)",
+  "Hip Circle":"Círculo de Cadera",
+  "Hip 90 90":"Cadera 90/90",
+  "Pigeon Stretch":"Estiramiento de Paloma",
+  "World Greatest Stretch":"El Mejor Estiramiento del Mundo",
+  "Thoracic Rotation":"Rotación Torácica",
+  "Thread The Needle":"Enhebrar la Aguja (movilidad)",
+  "Chest Opener":"Apertura de Pecho",
+  "Lat Stretch":"Estiramiento de Dorsal",
+  "Hip Flexor Stretch":"Estiramiento de Flexor de Cadera",
+  "Couch Stretch":"Estiramiento en Sofá",
+  "Pigeon Pose":"Postura de Paloma",
+  "Scorpion Stretch":"Estiramiento del Escorpión",
+  "Spiderman Stretch":"Estiramiento del Spiderman",
+  "Spiderman Lunge":"Zancada Spiderman",
+  "Inchworm":"Gusanillo",
+  "Walkout":"Caminar con Manos (inchworm)",
+  "Bear Hold":"Aguante de Oso",
+  "Bear Plank":"Plancha de Oso",
+  "Plank Shoulder Tap":"Plancha con Toque de Hombros",
+  "Plank Hip Tap":"Plancha con Toque de Cadera",
+  "Plank Reach":"Plancha con Alcance",
+  "Side Plank Hip Lift":"Plancha Lateral con Elevación de Cadera",
+  "Side Plank Rotation":"Plancha Lateral con Rotación",
+  "Side Plank Row":"Plancha Lateral con Remo",
+  "Pallof Hold":"Aguante Pallof",
+  "Suitcase Deadlift":"Peso Muerto Maletín",
+  "Trap Bar Carry":"Carga con Barra Hexagonal",
+  "Overhead March":"Marcha con Carga Sobre la Cabeza",
+  "Rack Walk":"Marcha con Barra en Rack",
+  "Box Step Up":"Subida al Cajón",
+  "Lateral Step Up":"Subida Lateral al Step",
+  "Reverse Step Up":"Subida Inversa al Step",
+  "Skater Squat":"Sentadilla de Patinador",
+  "Lateral Squat":"Sentadilla Lateral",
+  "Cossack Squat":"Sentadilla Cosaca",
+  "Shrimp Squat":"Sentadilla Gamba",
+  "Rear Foot Elevated Split Squat":"Sentadilla Búlgara (pie elevado)",
+  "Front Foot Elevated Split Squat":"Sentadilla Dividida (pie adelantado elevado)",
+  "Leg Press":"Prensa de Pierna",
+  "Hack Squat Machine":"Sentadilla Hack en Máquina",
+  "Leg Extension":"Extensión de Cuádriceps",
+  "Leg Curl":"Curl de Isquiotibiales",
+  "Seated Leg Curl":"Curl de Isquiotibiales Sentado",
+  "Lying Leg Curl":"Curl de Isquiotibiales Tumbado",
+  "Standing Leg Curl":"Curl de Isquiotibiales de Pie",
+  "Adductor Machine":"Máquina de Aductores",
+  "Abductor Machine":"Máquina de Abductores",
+  "Chest Press Machine":"Máquina de Press de Pecho",
+  "Shoulder Press Machine":"Máquina de Press de Hombros",
+  "Row Machine":"Máquina de Remo",
+  "Assisted Pull Up":"Dominada Asistida",
+  "Assisted Chin Up":"Dominada Supina Asistida",
+  "Weighted Pull Up":"Dominada con Peso",
+  "Weighted Chin Up":"Dominada Supina con Peso",
+  "Strict Pull Up":"Dominada Estricta",
+  "Kipping Pull Up":"Dominada con Impulso",
+  "Ring Row":"Remo en Anillas",
+  "Ring Dip":"Fondo en Anillas",
+  "Bar Dip":"Fondo en Paralelas",
+  "Chest Dip":"Fondo Inclinado (pecho)",
+  "Tricep Dip":"Fondo de Tríceps",
+  "Bench Dip":"Fondo en Banco",
+  "Push Up":"Flexión de Brazos",
+  "Close Grip Push Up":"Flexión Agarre Estrecho",
+  "Wide Grip Push Up":"Flexión Agarre Ancho",
+  "Diamond Push Up":"Flexión en Diamante",
+  "Decline Push Up":"Flexión Declinada",
+  "Incline Push Up":"Flexión Inclinada",
+  "Archer Push Up":"Flexión Arquero",
+  "Spiderman Push Up":"Flexión Spiderman",
+  "T Push Up":"Flexión en T",
+  "Plyo Push Up":"Flexión Pliométrica",
+  "Clap Push Up":"Flexión con Palma",
+  "One Arm Push Up":"Flexión con un Brazo",
+  "Handstand Push Up":"Flexión en Pino",
+  "Pike Push Up":"Flexión en Pica",
+  "Seated Row":"Remo Sentado",
+  "Chest Supported Dumbbell Row":"Remo con Mancuerna (apoyo pecho)",
+  "Meadows Row":"Remo Meadows",
+  "Pendlay Row":"Remo Pendlay",
+  "Kroc Row":"Remo Kroc",
+  "T Bar Row":"Remo en T",
+  "Seal Row":"Remo en Banco Horizontal",
+  "Prone Row":"Remo Prono",
+  "High Row":"Remo Alto",
+  "Low Row":"Remo Bajo",
+  "Half Kneeling Row":"Remo con una Rodilla en Suelo",
+  "Half Kneeling Press":"Press con una Rodilla en Suelo",
+  "Tall Kneeling Press":"Press de Rodillas (ambas)",
+  "Arnold Press":"Press Arnold",
+  "Scott Curl":"Curl en Banco Scott",
+  "Preacher Curl":"Curl en Banco Predicador",
+  "Zottman Curl":"Curl Zottman",
+  "Reverse Curl":"Curl Inverso",
+  "Cross Body Curl":"Curl Cruzado",
+  "21s Curl":"Curl 21",
+  "Overhead Tricep Extension":"Extensión de Tríceps Sobre la Cabeza",
+  "Skull Crusher":"Rompecráneos",
+  "Close Grip Bench Press":"Press Banca Agarre Estrecho",
+  "JM Press":"Press JM (tríceps)",
+  "Tate Press":"Press Tate (tríceps)",
+  "French Press":"Press Francés (tríceps)",
+  "Tricep Kickback":"Patada Atrás de Tríceps",
+  "Tricep Pushdown":"Jalón de Tríceps",
+  "Rope Pushdown":"Jalón de Tríceps con Cuerda",
+  "Front Squat":"Sentadilla Frontal",
+  "Split Squat":"Sentadilla Dividida",
+  "Air Squat":"Sentadilla Libre",
+  "Sumo Squat":"Sentadilla Sumo",
+  "Jump Squat":"Sentadilla con Salto",
+  "Pause Squat":"Sentadilla con Pausa",
+  "Tempo Squat":"Sentadilla con Tempo",
+  "Anderson Squat":"Sentadilla Anderson (desde rack)",
+  "Duck Walk":"Caminar en Cuclillas",
+  "Skater":"Patinador",
+  "Lateral Bound":"Salto Lateral",
+  "Broad Jump":"Salto Horizontal",
+  "Tuck Jump":"Salto Encogido",
+  "Depth Jump":"Salto en Profundidad",
+  "Depth Drop":"Caída en Profundidad",
+  "Single Leg Jump":"Salto Unilateral",
+  "Continuous Jump":"Salto Continuo",
+  "Reactive Jump":"Salto Reactivo",
+  "Ankle Hop":"Salto de Tobillo",
+  "Pogo Hop":"Salto Pogo",
+  "Lateral Hop":"Salto Lateral Corto",
+  "Speed Skater":"Patinador Rápido",
+  "High Knee Run":"Carrera con Rodilla Alta",
+  "Butt Kick":"Talón al Glúteo",
+  "A Skip":"Salto A",
+  "B Skip":"Salto B",
+  "Shuffle":"Desplazamiento Lateral",
+  "Lateral Shuffle":"Desplazamiento Lateral Rápido",
+  "Side Shuffle":"Paso Lateral",
+  "Crossover Step":"Paso Cruzado",
+  "Carioca":"Karaoke / Paso Cruzado",
+  "Defensive Slide":"Deslizamiento Defensivo",
+  "Deceleration":"Desaceleración",
+  "Sprint":"Sprint",
+  "Acceleration":"Aceleración",
+  "Change Of Direction":"Cambio de Dirección",
+  "T Drill":"Ejercicio en T",
+  "Pro Agility":"Agilidad Pro",
+  "Ladder Drill":"Ejercicio de Escalera",
+  "Cone Drill":"Ejercicio con Conos",
+  "Plank":"Plancha",
+  "Side Plank":"Plancha Lateral",
+  "RKC Plank":"Plancha RKC",
+  "Long Lever Plank":"Plancha Palancas Largas",
+  "Forearm Plank":"Plancha en Antebrazos",
+  "Dead Bug":"Bicho Muerto",
+  "Bird Dog":"Pájaro-Perro",
+  "Bear Crawl":"Gateo del Oso",
+  "Reverse Crunch":"Crunch Inverso",
+  "Bicycle Crunch":"Crunch Bicicleta",
+  "Oblique Crunch":"Crunch Oblicuo",
+  "Windshield Wiper":"Limpiaparabrisas",
+  "Leg Lower":"Descenso de Piernas",
+  "Leg Raise":"Elevación de Piernas",
+  "Scissor Kick":"Patada Tijera",
+  "Flutter Kick":"Patada Flutter",
+  "Russian Twist":"Giro Ruso",
+  "Wood Chop":"Leñador",
+  "Pallof Press":"Press Pallof",
+  "Suitcase Carry":"Carga Maletín",
+  "Farmer Carry":"Marcha del Agricultor",
+  "Waiters Carry":"Marcha del Camarero",
+  "Waiter Carry":"Marcha del Camarero",
+  "Overhead Carry":"Marcha sobre la Cabeza",
+  "Yoke Carry":"Carga en Yugo",
+  "Sandbag Carry":"Carga con Saco de Arena",
+  "Trap Bar Carry":"Carga con Barra Hexagonal",
+  "Bear Hug Carry":"Carga Abrazada",
+  "Zercher Carry":"Carga Zercher",
+  "Hip March":"Marcha de Cadera",
+  "Pallof Hold":"Aguante Pallof",
+  "Copenhagen Plank":"Plancha de Copenhague",
+  "Adductor Squeeze":"Contracción de Aductores",
+  "Isometric Squat Hold":"Sentadilla Isométrica",
+  "Wall Squat":"Sentadilla en Pared",
+  "Isometric Lunge":"Zancada Isométrica",
+  "Iso Hold Lunge":"Zancada con Aguante Isométrico",
+  // Patrones unilateral + cable (difíciles para el auto-traductor)
+  "Single Arm Cable Row":"Remo en Polea Unilateral",
+  "Single Arm Cable Pull Down":"Jalón en Polea Unilateral",
+  "Single Arm Cable Bicep Curl":"Curl de Bíceps en Polea Unilateral",
+  "Single Arm Cable Tricep Pushdown":"Jalón de Tríceps en Polea Unilateral",
+  "Single Arm Cable Lateral Raise":"Elevación Lateral en Polea Unilateral",
+  "Single Arm Cable Front Raise":"Elevación Frontal en Polea Unilateral",
+  "Single Arm Cable Fly":"Apertura de Pecho en Polea Unilateral",
+  "Single Arm Cable Press":"Press en Polea Unilateral",
+  "Single Arm Cable Row Kneeling":"Remo en Polea Unilateral de Rodillas",
+  // Incline + dumbbell combinados
+  "Incline Dumbbell Bench Press":"Press de Banca Inclinado con Mancuerna",
+  "Incline Dumbbell Chest Fly":"Apertura de Pecho Inclinada con Mancuerna",
+  "Incline Dumbbell Bicep Curl":"Curl de Bíceps Inclinado con Mancuerna",
+  "Decline Dumbbell Bench Press":"Press de Banca Declinado con Mancuerna",
+  "Flat Dumbbell Bench Press":"Press de Banca Plano con Mancuerna",
+  // 4-point / posicionales
+  "4 Point Hold":"Aguante a Cuadrupedia (4 apoyos)",
+  "3 Point Hold":"Aguante a 3 Apoyos",
+  "2 Point Hold":"Aguante a 2 Apoyos (diagonal)",
+  "Bear Hold":"Aguante de Oso (cuadrupedia)",
+  "Dead Hang":"Colgado Isométrico en Barra",
+  "Active Hang":"Colgado Activo en Barra",
+  "Passive Hang":"Colgado Pasivo en Barra",
+  // Comunes que el auto-traductor ordena mal
+  "Alternating Dumbbell Lunge":"Zancada Alternada con Mancuerna",
+  "Alternating Reverse Lunge":"Zancada Inversa Alternada",
+  "Alternating Forward Lunge":"Zancada Frontal Alternada",
+  "Alternating Lateral Lunge":"Zancada Lateral Alternada",
+  "Alternating Dumbbell Bicep Curl":"Curl de Bíceps Alternado con Mancuerna",
+  "Alternating Dumbbell Shoulder Press":"Press de Hombros Alternado con Mancuerna",
+  "Alternating Dumbbell Row":"Remo Alternado con Mancuerna",
+  "Alternating Dumbbell Hammer Curl":"Curl Martillo Alternado con Mancuerna",
+  "Alternating Kettlebell Swing":"Balanceo Alternado con Kettlebell",
+  "Banded Glute Bridge":"Puente de Glúteos con Banda",
+  "Banded Hip Thrust":"Empuje de Cadera con Banda",
+  "Banded Squat":"Sentadilla con Banda",
+  "Banded Romanian Deadlift":"Peso Muerto Rumano con Banda",
+  "Banded Pull Apart":"Separación de Banda",
+  "Banded Lateral Walk":"Caminar Lateral con Banda",
+  "Banded Monster Walk":"Caminar del Monstruo con Banda",
+  "Banded Clamshell":"Almeja con Banda",
+  "Banded Donkey Kick":"Patada de Burro con Banda",
+  "Banded Fire Hydrant":"Hidrante con Banda",
+  "Banded Good Morning":"Buenos Días con Banda",
+  "Banded Pull Through":"Tirón con Banda (cadera)",
 };
+
+// ══════════════════════════════════════════════════════════════════
+// AUTO-TRANSLATION SYSTEM
+// Detects English exercise names and returns Spanish equivalent
+// ══════════════════════════════════════════════════════════════════
+
+// Phrases checked longest-first (order matters)
+const _ES_PH=[
+  ['push up','flexión'],['push-up','flexión'],['pull up','dominada'],['pull-up','dominada'],
+  ['chin up','dominada supina'],['chin-up','dominada supina'],
+  ['step up','subida al step'],['step-up','subida al step'],
+  ['sit up','abdominal'],['sit-up','abdominal'],
+  ['get up','levantamiento'],['v-up','abdominal en V'],['v up','abdominal en V'],
+  ['box jump','salto al cajón'],['plyo box','cajón pliométrico'],
+  ['jump squat','sentadilla con salto'],['jump lunge','zancada con salto'],
+  ['jump rope','comba'],['broad jump','salto horizontal'],['tuck jump','salto encogido'],
+  ['depth jump','salto en profundidad'],['lateral hop','salto lateral'],
+  ['lateral jump','salto lateral'],['pogo hop','salto pogo'],['ankle hop','salto de tobillo'],
+  ['skater jump','salto de patinador'],['skater bound','salto de patinador'],
+  ['180 squat','sentadilla 180'],['prisoner squat','sentadilla manos en cabeza'],
+  ['prisoner lunge','zancada manos en cabeza'],
+  ['goblet squat','sentadilla goblet'],['back squat','sentadilla trasera'],
+  ['front squat','sentadilla frontal'],['split squat','sentadilla dividida'],
+  ['air squat','sentadilla libre'],['sumo squat','sentadilla sumo'],
+  ['box squat','sentadilla en cajón'],['zercher squat','sentadilla zercher'],
+  ['hack squat','sentadilla hack'],['cossack squat','sentadilla cosaca'],
+  ['frog squat','sentadilla rana'],['wall sit','sentadilla en pared'],
+  ['pistol squat','sentadilla pistola'],['deep squat','sentadilla profunda'],
+  ['isometric squat','sentadilla isométrica'],
+  ['romanian deadlift','peso muerto rumano'],['rdl','peso muerto rumano'],
+  ['sumo deadlift','peso muerto sumo'],['stiff leg','pierna rígida'],
+  ['deficit deadlift','peso muerto en déficit'],['rack pull','tirón desde rack'],
+  ['bench press','press de banca'],['chest press','press de pecho'],
+  ['overhead press','press sobre la cabeza'],['shoulder press','press de hombros'],
+  ['military press','press militar'],['arnold press','press arnold'],
+  ['floor press','press en suelo'],['incline press','press inclinado'],
+  ['decline press','press declinado'],['kneeling press','press de rodillas'],
+  ['lateral raise','elevación lateral'],['front raise','elevación frontal'],
+  ['upright row','remo al mentón'],['bent over row','remo inclinado'],
+  ['bent-over row','remo inclinado'],['seated row','remo sentado'],
+  ['cable row','remo en polea'],
+  ['hamstring curl','curl de isquiotibiales'],['leg curl','curl de pierna'],
+  ['bicep curl','curl de bíceps'],['biceps curl','curl de bíceps'],
+  ['hammer curl','curl martillo'],['concentration curl','curl concentrado'],
+  ['tricep extension','extensión de tríceps'],['triceps extension','extensión de tríceps'],
+  ['skull crusher','rompecráneos'],
+  ['glute bridge','puente de glúteos'],['hip thrust','empuje de cadera'],
+  ['hip extension','extensión de cadera'],['hip abduction','abducción de cadera'],
+  ['hip adduction','aducción de cadera'],['hip circle','círculo de cadera'],
+  ['hip rotation','rotación de cadera'],['hip flexor','flexor de cadera'],
+  ['hip hinge','bisagra de cadera'],['hip switch','cambio de cadera'],
+  ['donkey kick','patada de burro'],['fire hydrant','hidrante'],
+  ['clamshell','almeja'],['calf raise','elevación de talones'],['heel raise','elevación de talones'],
+  ['leg raise','elevación de piernas'],['leg lower','descenso de piernas'],
+  ['leg press','prensa de pierna'],
+  ['chest fly','apertura de pecho'],['chest flye','apertura de pecho'],
+  ['reverse lunge','zancada inversa'],['walking lunge','zancada caminando'],
+  ['curtsy lunge','zancada cruzada'],['forward lunge','zancada frontal'],
+  ['lateral lunge','zancada lateral'],['reverse lunge','zancada inversa'],
+  ['mountain climber','escalador'],['high knee','rodilla alta'],
+  ['butt kick','talón al glúteo'],['bear crawl','gateo del oso'],
+  ['crab walk','caminar de cangrejo'],['inchworm','gusanillo'],
+  ['bird dog','pájaro-perro'],['dead bug','bicho muerto'],
+  ['hollow body','cuerpo hueco'],['back extension','extensión lumbar'],
+  ['side plank','plancha lateral'],['renegade row','remo renegado'],
+  ['face pull','tirón a la cara'],['band pull apart','separación de banda'],
+  ['pallof press','press pallof'],
+  ['farmers walk','marcha del agricultor'],['farmer walk','marcha del agricultor'],
+  ['waiter walk','marcha del camarero'],['suitcase carry','marcha maletín'],
+  ['overhead carry','marcha sobre la cabeza'],
+  ['power clean','cargada de potencia'],['hang clean','cargada en suspensión'],
+  ['hang snatch','arrancada en suspensión'],['clean and jerk','dos tiempos'],
+  ['clean pull','tirón de cargada'],['snatch pull','tirón de arrancada'],
+  ['muscle up','muscle-up'],['handstand push up','flexión en pino'],
+  ['ring dip','fondos en anillas'],['ring row','remo en anillas'],
+  ['ab crunch','crunch abdominal'],['ab roller','rueda abdominal'],['ab wheel','rueda abdominal'],
+  ['torso rotation','rotación de tronco'],['trunk rotation','rotación de tronco'],
+  ['thoracic rotation','rotación torácica'],
+  ['shoulder tap','toque de hombro'],['shoulder taps','toques de hombro'],
+  ['single leg','unilateral'],['single arm','unilateral (brazo)'],
+  ['double leg','bilateral (piernas)'],['double arm','bilateral (brazos)'],
+  ['bent over','inclinado'],['upper back','espalda alta'],['lower back','zona lumbar'],
+  ['good morning','buenos días'],['straight leg','pierna recta'],
+  ['world greatest stretch','el mejor estiramiento'],
+  ["world's greatest stretch","el mejor estiramiento"],
+  ['cat cow','gato-vaca'],['around the world','alrededor del mundo'],
+  ['battle rope','cuerda de batalla'],['battle ropes','cuerdas de batalla'],
+  ['dead ball','balón medicinal'],['medicine ball','balón medicinal'],
+  ['med ball','balón medicinal'],['slam ball','balón slam'],['wall ball','wall ball'],
+  ['weight plate','disco'],['foam roller','rulo'],['jump rope','comba'],
+  ['kettlebell swing','balanceo de kettlebell'],['turkish get-up','levantamiento turco'],
+  ['turkish get up','levantamiento turco'],
+  ['box dip','fondos en cajón'],['tricep dip','fondos de tríceps'],
+  ['kneeling','de rodillas'],['standing','de pie'],['seated','sentado'],['lying','tumbado'],
+  ['lying face down','prono'],['lying face up','supino'],
+  ['on all fours','a cuadrupedia'],['quadruped','a cuadrupedia'],
+  ['alternate','alternado'],['alternating','alternando'],
+  ['single arm','unilateral (brazo)'],['single leg','unilateral (pierna)'],
+  ['single-arm','unilateral'],['single-leg','unilateral'],
+  ['double arm','bilateral'],['double leg','bilateral (piernas)'],
+  ['both arms','bilateral'],['both legs','bilateral (piernas)'],
+  ['one arm','unilateral'],['one leg','unilateral (pierna)'],
+  ['isometric','isométrico'],['eccentric','excéntrico'],['explosive','explosivo'],
+  ['plyometric','pliométrico'],['weighted','con carga'],
+  ['assisted','asistido'],['loaded','cargado'],
+  ['overhand','prono (agarre)'],['underhand','supino (agarre)'],['neutral grip','agarre neutro'],
+  ['wide grip','agarre ancho'],['close grip','agarre estrecho'],['narrow grip','agarre estrecho'],
+  ['pause','con pausa'],['tempo','con tempo'],
+  ['3 point','tres apoyos'],['2 point','dos apoyos'],
+  ['feet elevated','pies elevados'],['arms elevated','brazos elevados'],
+  ['overhead','sobre la cabeza'],
+  ['1 and a half','uno y medio'],
+  ['slow eccentric','excéntrico lento'],['fast','rápido'],
+  ['with rotation','con rotación'],['no rotation','sin rotación'],
+  ['contralateral','contralateral'],['ipsilateral','ipsilateral'],
+  ['close stance','base estrecha'],['wide stance','base ancha'],
+];
+
+// Word-level fallback (applied after phrases)
+const _ES_WD={
+  dumbbell:'mancuerna',dumbbel:'mancuerna',barbell:'barra',kettlebell:'kettlebell',
+  kettlebel:'kettlebell',cable:'polea',band:'banda',bench:'banco',bosu:'bosu',
+  box:'cajón',fitball:'fitball',trx:'TRX',step:'step',slider:'slider',
+  sandbag:'saco de arena',disc:'disco',plate:'disco',reformer:'reformer',
+  rower:'remo',airbike:'bici de aire',skierg:'skierg',treadmill:'cinta',
+  bike:'bicicleta',landmine:'landmine',ybell:'ybell',abmat:'abmat',
+  mace:'maza',hammer:'maza',tyre:'neumático',tire:'neumático',sled:'trineo',
+  bag:'saco',cone:'cono',cones:'conos',mat:'colchoneta',ladder:'escalera',
+  rope:'cuerda',rings:'anillas',bar:'barra',rack:'rack',pads:'pads',
+  squat:'sentadilla',lunge:'zancada',deadlift:'peso muerto',press:'press',
+  row:'remo',pull:'tirón',push:'empuje',curl:'curl',raise:'elevación',
+  fly:'apertura',flye:'apertura',extension:'extensión',rotation:'rotación',
+  twist:'giro',crunch:'crunch',plank:'plancha',bridge:'puente',
+  swing:'balanceo',snatch:'arrancada',clean:'cargada',jerk:'envión',
+  thruster:'thruster',jump:'salto',hop:'salto',crawl:'gateo',
+  dip:'fondo',dips:'fondos',slam:'slam',reach:'alcance',tap:'toque',
+  carry:'carga',hold:'aguante',stretch:'estiramiento',roll:'rodamiento',
+  lift:'elevación',drive:'impulso',circle:'círculo',wave:'ola',lower:'descenso',
+  chest:'pecho',shoulder:'hombro',shoulders:'hombros',arm:'brazo',arms:'brazos',
+  bicep:'bíceps',biceps:'bíceps',tricep:'tríceps',triceps:'tríceps',
+  leg:'pierna',legs:'piernas',quad:'cuádriceps',quads:'cuádriceps',
+  hamstring:'isquiotibial',hamstrings:'isquiotibiales',glute:'glúteo',glutes:'glúteos',
+  hip:'cadera',hips:'caderas',knee:'rodilla',knees:'rodillas',ankle:'tobillo',
+  calf:'gemelo',calves:'gemelos',core:'core',abs:'abdominales',oblique:'oblicuo',
+  obliques:'oblicuos',forearm:'antebrazo',forearms:'antebrazos',wrist:'muñeca',
+  neck:'cuello',spine:'columna',thoracic:'torácico',lumbar:'lumbar',
+  lat:'dorsal',lats:'dorsales',trap:'trapecio',traps:'trapecios',
+  alternate:'alternado',alternating:'alternando',single:'unilateral',double:'doble',
+  incline:'inclinado',decline:'declinado',reverse:'inverso',sumo:'sumo',
+  wide:'ancho',narrow:'estrecho',eccentric:'excéntrico',isometric:'isométrico',
+  explosive:'explosivo',static:'estático',dynamic:'dinámico',tempo:'tempo',
+  slow:'lento',fast:'rápido',high:'alto',low:'bajo',front:'frontal',
+  side:'lateral',lateral:'lateral',diagonal:'diagonal',overhead:'sobre cabeza',
+  elevated:'elevado',deficit:'en déficit',half:'medio',full:'completo',
+  partial:'parcial',assisted:'asistido',weighted:'con carga',
+  left:'izquierda',right:'derecha',forward:'adelante',backward:'atrás',
+  inner:'interior',outer:'exterior',
+  burpee:'burpee',superman:'superman',inchworm:'gusano',windmill:'molino de viento',
+  scorpion:'escorpión',beast:'bestia',crab:'cangrejo',spider:'araña',
+  spiderman:'spiderman',butterfly:'mariposa',kipping:'kipping',strict:'estricto',
+  nordic:'nórdico',complex:'complejo',combo:'combinado',
+  pullup:'dominada',pushup:'flexión',
+  fitbench:'banco funcional',fitband:'banda funcional',fitrope:'cuerda',
+  with:'con',without:'sin',and:'y',on:'en',floor:'suelo',wall:'pared',
+  rack:'rack',from:'desde',over:'sobre',around:'alrededor',
+};
+
+// Spanish indicators — if name contains any of these it's already Spanish (skip translation)
+const _ES_INDICATORS=[
+  'sentadilla','zancada','peso muerto','flexión','dominada','tirón','empuje',
+  'bisagra','plancha','puente','balanceo','elevación','rotación','extensión',
+  'remo con','press de','press en','curl de','apertura de','marcha del',
+  'curl de','zancada','fondo','fondos','cadera','hombro','espalda',
+  'salto al cajón','arrodillado','bipedestación','cuadrupedia','decúbito',
+  'en polea','con banda','con barra','con mancuerna','con kettlebell',
+];
+
+function _isSpanishName(name){
+  const n=name.toLowerCase();
+  return _ES_INDICATORS.some(ind=>n.includes(ind));
+}
+
+// Equipment tokens extracted BEFORE translation so they move to the end as "con X"
+// Order matters: longer matches first to avoid partial matches
+const _EQ_EXTRACT=[
+  ['dumbbells','mancuernas','con'],
+  ['dumbbell','mancuerna','con'],
+  ['barbells','barras','con'],
+  ['barbell','barra','con'],
+  ['kettlebells','kettlebells','con'],
+  ['kettlebell','kettlebell','con'],
+  ['resistance band','banda elástica','con'],
+  ['cable machine','polea','en'],
+  ['medicine ball','balón medicinal','con'],
+  ['med ball','balón medicinal','con'],
+  ['slam ball','balón slam','con'],
+  ['battle ropes','cuerdas de batalla','con'],
+  ['battle rope','cuerda de batalla','con'],
+  ['sandbag','saco de arena','con'],
+  ['pull up bar','barra de dominadas','en'],
+  ['pullup bar','barra de dominadas','en'],
+];
+
+// Modifiers that should move AFTER the main movement in Spanish
+// (in English they often appear at the start)
+const _ES_MOD_ORDER=[
+  'alternado','alternando','unilateral','bilateral','isométrico','excéntrico',
+  'explosivo','pliométrico','de rodillas','de pie','sentado','tumbado',
+  'inclinado','declinado','inverso','sumo','con carga','asistido',
+  'lento','rápido','estático','dinámico','completo','parcial','medio',
+  'izquierda','derecha','adelante','atrás',
+];
+
+function _autoTranslate(name){
+  // 1. Exact match in manual dict
+  if(EXERCISE_ES[name]) return EXERCISE_ES[name];
+  // 2. Already Spanish?
+  if(_isSpanishName(name)) return null;
+
+  const orig=name.toLowerCase().trim();
+
+  // 3. Must contain at least one English keyword
+  const hasEnglish=_ES_PH.some(([ph])=>orig.includes(ph))||
+    Object.keys(_ES_WD).some(w=>new RegExp('\\b'+w.replace(/[-]/g,'\\-')+'\\b').test(orig));
+  if(!hasEnglish) return null;
+
+  // 4. Extract equipment tokens from original English (before phrase subs mess up structure)
+  let base=orig;
+  const equipParts=[];
+  for(const [en,es,prep] of _EQ_EXTRACT){
+    const re=new RegExp('\\b'+en.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
+    if(re.test(base)){
+      equipParts.push({es,prep});
+      base=base.replace(re,' ').replace(/\s+/g,' ').trim();
+    }
+  }
+
+  // 5. Apply phrase substitutions to base
+  for(const [ph,es] of _ES_PH){
+    const re=new RegExp('\\b'+ph.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','gi');
+    base=base.replace(re,es);
+  }
+
+  // 6. Word-level fallback for remaining English words only
+  base=base.replace(/\b[a-z]+\b/g,w=>_ES_WD[w]||w);
+
+  // 7. Clean up
+  base=base.trim().replace(/\s+/g,' ');
+
+  // 8. Reconstruct: [movement] + [con/en equipment]
+  // Avoid adding equipment if phrase subs already included it
+  let result=base;
+  for(const {es,prep} of equipParts){
+    const esRoot=es.replace('mancuernas','mancuerna').replace('barras','barra');
+    if(!result.toLowerCase().includes(esRoot.toLowerCase())){
+      result=result+' '+prep+' '+es;
+    }
+  }
+
+  // 9. Capitalise first letter only
+  result=result.trim().replace(/\s+/g,' ');
+  result=result.charAt(0).toUpperCase()+result.slice(1);
+
+  // 10. If nothing changed, skip
+  if(result.toLowerCase()===orig) return null;
+  return result;
+}
+
+// Returns display name with Spanish translation in parentheses when available
+function exDispName(nameOrEx){
+  const name=typeof nameOrEx==='string'?nameOrEx:(nameOrEx.name||'');
+  const es=_autoTranslate(name);
+  if(!es||es===name) return name;
+  return name+' <span class="ex-name-es">('+es+')</span>';
+}
 
 window._dbFilter="all";
 
@@ -9152,9 +10119,10 @@ function buildWeekSessions(template,monday,level,equipment,focusPref,phase){
     const hitFmt=freshHiit.length>0?rnd(freshHiit):rnd(st.hiitFormats);
     usedHiitFmts.add(hitFmt);
     const focus=focusPref==="split"?t.focus:"full_body";
+    const _wkGs=parseInt((document.getElementById("f-group-size")||{}).value)||8;
     const sess=generateSession({
       trainer:"",client:date.toLocaleDateString("es-ES",{day:"numeric",month:"short"}),
-      level,focus,notes:"",equipment,strFormat:strFmt,hiitFormat:hitFmt
+      level,focus,notes:"",equipment,strFormat:strFmt,hiitFormat:hitFmt,groupSize:_wkGs
     });
     sess.date=date.toISOString();sess.sessionType=t.type;
     const id=storeSess(sess);
@@ -9191,15 +10159,29 @@ function renderWeekPlan(week,monday,container,level){
   const mondayStr=monday.toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"});
   const pushPullOk=pull>=push;
 
-  const grid=week.map(d=>{
+  // Detect inter-session conflicts (lower body back-to-back)
+  const trainedByIdx=week.map((d,i)=>({...d,_wkIdx:i})).filter(d=>!d.rest);
+  const conflictDays=new Set();
+  for(let i=1;i<trainedByIdx.length;i++){
+    const prev=trainedByIdx[i-1];const cur=trainedByIdx[i];
+    if(cur._wkIdx-prev._wkIdx<=1){// consecutive training days
+      const prevPats=new Set((prev.sess.blocks.fuerza.exercises||[]).map(e=>e.pattern));
+      const curPats=(cur.sess.blocks.fuerza.exercises||[]).map(e=>e.pattern);
+      const overlap=curPats.filter(p=>['hinge','squat'].includes(p)&&prevPats.has(p));
+      if(overlap.length>=2){conflictDays.add(cur._wkIdx);conflictDays.add(prev._wkIdx);}
+    }
+  }
+
+  const grid=week.map((d,_wi)=>{
     if(d.rest) return `<div class="pday rest">
       <div class="pday-dow">${d.label} ${d.date.getDate()}</div>
       <div style="font-size:18px;margin-top:6px;color:var(--text3)">😴</div>
       <div style="font-size:11px;color:var(--text3);margin-top:4px">Descanso</div>
     </div>`;
+    const conflict=conflictDays.has(_wi);
     const patList=d.pats.map(p=>`<span class="pday-pat">${p}</span>`).join("");
-    return `<div class="pday ${d.st.css}">
-      <div class="pday-dow">${d.label} ${d.date.getDate()}</div>
+    return `<div class="pday ${d.st.css}" style="${conflict?'border:2px solid #f59e0b':''}">
+      <div class="pday-dow">${d.label} ${d.date.getDate()}${conflict?' <span style="font-size:9px;background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 5px;font-weight:700">⚠ tren inf</span>':''}</div>
       <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
         <span style="font-size:16px">${d.st.icon}</span>
         <span class="pday-type" style="color:${d.st.color}">${d.t.label}</span>
@@ -11785,7 +12767,7 @@ function regenSection(sectionKey){
   var recentNames=getRecentExerciseNames(7);
   switch(sectionKey){
     case"movilidad":
-      sess.blocks.movilidad=pickN(DB.movilidad,4,level,equipment,recentNames);
+      sess.blocks.movilidad=pickMobilidad(level,equipment,recentNames);
       break;
     case"core":{
       var coreCats=["isometrico","antiextension","antiflexion_lateral","antirotacion"];
