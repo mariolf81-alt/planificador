@@ -210,6 +210,36 @@ textarea{resize:vertical;min-height:70px}
 .wk-ctx-dup_heavy{background:#fff1f2;color:#be123c;border:1px solid #fda4af}
 .wk-ctx-dup_light{background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7}
 .wk-ctx-density_challenge{background:#fdf4ff;color:#7e22ce;border:1px solid #e879f9}
+/* ── Chips configuración sesión ─────────────────────────────── */
+/* ── Formulario nueva sesión ── */
+.gen-section{padding:14px 0;border-bottom:1px solid var(--border)}
+.gen-section:last-of-type{border-bottom:none}
+.gen-section-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.gen-section-collapsible .gen-section-hdr{margin-bottom:0}
+.gen-section-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;cursor:pointer;padding:0;font-family:inherit}
+.equip-sub{margin-bottom:10px}
+.equip-sub:last-child{margin-bottom:0}
+.equip-sub-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px;padding:3px 8px;background:var(--bg);border-radius:4px;display:inline-block}
+/* ── legacy ── */
+.cond-panel{display:flex;flex-direction:column;gap:14px}
+.cond-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cond-row-3{grid-template-columns:1fr 1fr auto}
+@media(max-width:480px){.cond-row,.cond-row-3{grid-template-columns:1fr}}
+.cond-block{display:flex;flex-direction:column;gap:6px}
+.cond-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)}
+.cond-chips{display:flex;flex-wrap:wrap;gap:6px}
+.cond-select{padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;color:var(--text);width:100%;outline:none;cursor:pointer}
+.cond-select:focus{border-color:#7c3aed}
+.radio-chip{padding:6px 14px;border-radius:20px;border:1.5px solid #e5e7eb;background:#f8fafc;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .12s;white-space:nowrap}
+.radio-chip:hover{border-color:#7c3aed;color:#7c3aed}
+.radio-chip.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.restriction-chip{padding:6px 12px;border-radius:20px;border:1.5px solid #e5e7eb;background:#f8fafc;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .12s;white-space:nowrap}
+.restriction-chip:hover{border-color:#ef4444;color:#ef4444}
+.restriction-chip.active{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+.profile-chip{padding:5px 12px;border-radius:16px;border:1.5px solid #ddd6fe;background:#faf5ff;font-size:12px;font-weight:700;cursor:pointer;color:#7c3aed;display:inline-flex;align-items:center;gap:6px;transition:all .12s}
+.profile-chip:hover{background:#ede9fe}
+.profile-chip-del{opacity:.4;font-size:10px;line-height:1;padding:1px 3px;border-radius:4px;border:none;background:none;cursor:pointer;color:inherit}
+.profile-chip-del:hover{opacity:1;background:#fca5a5;color:#b91c1c}
 .wk-ctx-rm{font-weight:600;opacity:.85;margin-left:4px}
 /* ---- EDIT MODE ---- */
 .edit-mode-banner{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:11px 16px;margin-bottom:12px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:8px;font-weight:600}
@@ -833,74 +863,155 @@ textarea{resize:vertical;min-height:70px}
 
 <!-- TAB: GENERAR -->
 <section id="tab-gen" class="tab-panel">
-  <div class="card">
-    <div class="card-title">Nueva Sesión</div>
+  <div class="card" style="padding:0;overflow:hidden">
 
-    <!-- Fila info básica -->
-    <div class="form-grid" style="margin-bottom:14px">
-      <div class="fg">
-        <label>Entrenador</label>
-        <input id="f-trainer" type="text" placeholder="Nombre del entrenador">
-      </div>
-      <div class="fg">
-        <label>Cliente / Grupo</label>
-        <input id="f-client" type="text" placeholder="Nombre del cliente o grupo">
-      </div>
-      <div class="fg">
-        <label>Nº Sesión</label>
-        <input id="f-num" type="number" min="1" placeholder="Ej: 12" value="1">
-      </div>
-      <div class="fg">
-        <label>Mes del Programa</label>
-        <select id="f-mes">
-          <option value="1">Mes 1 — Adaptación</option>
-          <option value="2">Mes 2 — Fuerza Funcional</option>
-          <option value="3">Mes 3 — Intensificación</option>
-        </select>
-      </div>
+    <!-- CABECERA -->
+    <div style="padding:18px 20px 14px;border-bottom:1px solid var(--border)">
+      <div class="card-title" style="margin-bottom:0">⚡ Nueva Sesión</div>
     </div>
 
-    <!-- Condicionantes IA — bloque principal -->
-    <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1.5px solid #c4b5fd;border-radius:14px;padding:18px 20px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span style="font-size:15px;font-weight:800;color:#6d28d9">✨ Condicionantes de la sesión</span>
-        <span id="ai-gen-badge" class="ai-badge-pill" style="display: inline-flex;">● IA activa</span>
-      </div>
-      <div style="font-size:12px;color:#7c3aed;margin-bottom:10px;line-height:1.5">Describe con libertad: nivel del cliente, equipamiento disponible, lesiones, objetivos, método de entrenamiento preferido o cualquier condición a tener en cuenta. La IA diseñará la sesión adaptada a todo ello.</div>
-      <textarea id="f-condicionantes" rows="5" style="width:100%;border:1.5px solid #c4b5fd;border-radius:10px;padding:12px 14px;font-size:13px;font-family:inherit;background:#fff;color:var(--text);resize:vertical;outline:none;transition:border .15s;box-sizing:border-box" placeholder="Ej: «Mario, 38 años, nivel intermedio, entrena en gimnasio con barra y mancuernas. Molestias en rodilla derecha, evitar sentadillas con carga. Objetivo: ganancia de fuerza funcional. Mes 2 del programa»
+    <div style="padding:16px 20px;display:flex;flex-direction:column;gap:0">
 
-O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar grasa»" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#c4b5fd'"></textarea>
-      <div id="gen-ai-loading" class="ai-loading" style="display:none;margin-top:10px"><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span> Analizando con IA...</div>
-      <div id="gen-ai-result" class="ai-result" style="display:none;margin-top:10px"></div>
-    </div>
-
-    <!-- Ajustes avanzados (colapsable) -->
-    <div style="margin-bottom:14px">
-      <button type="button" onclick="_toggleAdvGen(this)" style="background:none;border:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:5px">
-        <span id="adv-gen-arrow">▶</span> Ajustes avanzados
-      </button>
-      <div id="adv-gen-panel" style="display:none;margin-top:12px">
+      <!-- ── SECCIÓN 1: PARTICIPANTES ──────────────────────────── -->
+      <div class="gen-section">
+        <div class="gen-section-hdr">👤 Participantes</div>
         <div class="form-grid">
           <div class="fg">
-            <label>Nivel</label>
-            <select id="f-level">
+            <label>Entrenador</label>
+            <input id="f-trainer" type="text" placeholder="Nombre del entrenador">
+          </div>
+          <div class="fg">
+            <label>Cliente / Grupo</label>
+            <input id="f-client" type="text" placeholder="Nombre del cliente o grupo">
+          </div>
+          <div class="fg">
+            <label>Nº Sesión</label>
+            <input id="f-num" type="number" min="1" placeholder="Ej: 12" value="1">
+          </div>
+          <div class="fg">
+            <label>Mes del Programa</label>
+            <select id="f-mes">
+              <option value="1">Mes 1 — Adaptación</option>
+              <option value="2">Mes 2 — Fuerza Funcional</option>
+              <option value="3">Mes 3 — Intensificación</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 2: PERFIL ──────────────────────────────────── -->
+      <div class="gen-section">
+        <div class="gen-section-hdr">🎯 Perfil</div>
+        <div class="cond-row">
+          <div class="cond-block">
+            <div class="cond-label">Nivel</div>
+            <div class="cond-chips" id="chips-level">
+              <button class="radio-chip" data-value="beginner" onclick="_setRadioChip('chips-level','f-level','beginner')">Principiante</button>
+              <button class="radio-chip active" data-value="intermediate" onclick="_setRadioChip('chips-level','f-level','intermediate')">Intermedio</button>
+              <button class="radio-chip" data-value="advanced" onclick="_setRadioChip('chips-level','f-level','advanced')">Avanzado</button>
+            </div>
+            <select id="f-level" style="display:none">
               <option value="beginner">Principiante</option>
               <option value="intermediate" selected="">Intermedio</option>
               <option value="advanced">Avanzado</option>
             </select>
           </div>
-          <div class="fg">
-            <label>Énfasis</label>
-            <select id="f-focus">
+          <div class="cond-block">
+            <div class="cond-label">Énfasis muscular</div>
+            <div class="cond-chips" id="chips-focus">
+              <button class="radio-chip active" data-value="full_body" onclick="_setRadioChip('chips-focus','f-focus','full_body')">Full Body</button>
+              <button class="radio-chip" data-value="upper" onclick="_setRadioChip('chips-focus','f-focus','upper')">Tren Superior</button>
+              <button class="radio-chip" data-value="lower" onclick="_setRadioChip('chips-focus','f-focus','lower')">Tren Inferior</button>
+            </div>
+            <select id="f-focus" style="display:none">
               <option value="full_body" selected="">Cuerpo completo</option>
-              <option value="upper">Énfasis tren superior</option>
-              <option value="lower">Énfasis tren inferior</option>
+              <option value="upper">Tren superior</option>
+              <option value="lower">Tren inferior</option>
             </select>
           </div>
-          <div class="fg">
-            <label>Formato fuerza</label>
-            <select id="f-str">
-              <option value="random">Aleatorio</option>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 3: RESTRICCIONES ──────────────────────────── -->
+      <div class="gen-section">
+        <div class="gen-section-hdr">⚠️ Restricciones médicas <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--text3);letter-spacing:0">(pueden combinarse)</span></div>
+        <div class="cond-chips" id="chips-restrictions">
+          <button class="restriction-chip" data-keyword="rodilla" onclick="_toggleRestriction(this)">🦵 Rodilla</button>
+          <button class="restriction-chip" data-keyword="hombro" onclick="_toggleRestriction(this)">💪 Hombro</button>
+          <button class="restriction-chip" data-keyword="lumbar" onclick="_toggleRestriction(this)">🔙 Lumbar</button>
+          <button class="restriction-chip" data-keyword="tobillo" onclick="_toggleRestriction(this)">🦶 Tobillo</button>
+          <button class="restriction-chip" data-keyword="embarazo" onclick="_toggleRestriction(this)">🤰 Embarazo</button>
+          <button class="restriction-chip" data-keyword="cuello" onclick="_toggleRestriction(this)">🫀 Cuello/Cervical</button>
+          <button class="restriction-chip" data-keyword="sin impacto" onclick="_toggleRestriction(this)">⬇️ Sin impacto</button>
+          <button class="restriction-chip" data-keyword="cardio suave" onclick="_toggleRestriction(this)">❤️ Cardio suave</button>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 4: MATERIAL ────────────────────────────────── -->
+      <div class="gen-section">
+        <div class="gen-section-hdr">🏋️ Material disponible</div>
+        <div id="equip-group">
+
+          <div class="equip-sub">
+            <div class="equip-sub-label">Peso libre</div>
+            <div class="chip-group">
+              <label class="chip sel"><input type="checkbox" value="barbell" checked="">🏋️ Barra olímpica</label>
+              <label class="chip sel"><input type="checkbox" value="dumbbell" checked="">💪 Mancuernas</label>
+              <label class="chip sel"><input type="checkbox" value="kettlebell" checked="">🔔 Kettlebell</label>
+              <label class="chip sel"><input type="checkbox" value="medicine_ball" checked="">⚽ Balón medicinal</label>
+              <label class="chip"><input type="checkbox" value="sandbag">🎒 Sandbag</label>
+            </div>
+          </div>
+
+          <div class="equip-sub">
+            <div class="equip-sub-label">Máquinas · Cardio · Combate</div>
+            <div class="chip-group">
+              <label class="chip sel"><input type="checkbox" value="cable" checked="">🔗 Poleas / Cable</label>
+              <label class="chip"><input type="checkbox" value="reformer">🛏️ Reformer Pilates</label>
+              <label class="chip"><input type="checkbox" value="cardio_machine">🚴 Máquina cardio</label>
+              <label class="chip"><input type="checkbox" value="battle_ropes">〰️ Battle ropes</label>
+              <label class="chip"><input type="checkbox" value="saco">🥊 Saco de boxeo</label>
+              <label class="chip"><input type="checkbox" value="pads">🤜 Paos / Mitones</label>
+              <label class="chip"><input type="checkbox" value="jump_rope">🪢 Comba</label>
+              <label class="chip"><input type="checkbox" value="sled">🛷 Trineo</label>
+            </div>
+          </div>
+
+          <div class="equip-sub">
+            <div class="equip-sub-label">Mobiliario · Anclajes · Suspensión</div>
+            <div class="chip-group">
+              <label class="chip sel"><input type="checkbox" value="bench" checked="">🪑 Banco</label>
+              <label class="chip sel"><input type="checkbox" value="box" checked="">📦 Cajón / Step</label>
+              <label class="chip sel"><input type="checkbox" value="pullup_bar" checked="">🔝 Barra dominadas</label>
+              <label class="chip"><input type="checkbox" value="trx">⛓️ TRX / Suspensión</label>
+            </div>
+          </div>
+
+          <div class="equip-sub">
+            <div class="equip-sub-label">Accesorios · Inestabilidad · Bandas</div>
+            <div class="chip-group">
+              <label class="chip sel"><input type="checkbox" value="band" checked="">🔴 Bandas elásticas</label>
+              <label class="chip sel"><input type="checkbox" value="foam_roller" checked="">🪵 Foam roller</label>
+              <label class="chip"><input type="checkbox" value="bosu">🔵 BOSU</label>
+              <label class="chip"><input type="checkbox" value="fitball">🟡 Fitball</label>
+              <label class="chip"><input type="checkbox" value="ab_wheel">⚙️ Rueda abdominal</label>
+              <label class="chip"><input type="checkbox" value="slider">🟦 Discos deslizantes</label>
+              <label class="chip"><input type="checkbox" value="ladder">🪜 Escalera agilidad</label>
+              <label class="chip"><input type="checkbox" value="cone">🔺 Conos</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 5: FORMATO ─────────────────────────────────── -->
+      <div class="gen-section">
+        <div class="gen-section-hdr">📋 Formato de trabajo</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="cond-block">
+            <div class="cond-label">Bloque de fuerza</div>
+            <select id="f-str" class="cond-select">
+              <option value="random">Aleatorio (progresión automática)</option>
               <optgroup label="Alta recuperación">
                 <option value="e3mom">E3MOM — Fuerza máxima</option>
                 <option value="e2mom">E2MOM — Fuerza submáxima</option>
@@ -920,9 +1031,9 @@ O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar gras
               </optgroup>
             </select>
           </div>
-          <div class="fg">
-            <label>Formato HIIT</label>
-            <select id="f-hiit">
+          <div class="cond-block">
+            <div class="cond-label">Bloque HIIT</div>
+            <select id="f-hiit" class="cond-select">
               <option value="random">Aleatorio</option>
               <option value="tabata">Tabata (4 min)</option>
               <option value="sprint_intervals">Sprints (5 min)</option>
@@ -933,312 +1044,85 @@ O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar gras
               <option value="pyramid">Pirámide HIIT</option>
             </select>
           </div>
-          <div class="fg">
-            <label>Objetivo general</label>
-            <select id="f-obj-gen">
-              <option value="Adaptación anatómica">Adaptación anatómica</option>
-              <option value="Aumento niveles de fuerza">Aumento de fuerza</option>
-              <option value="Desarrollo fuerza funcional">Fuerza funcional</option>
-              <option value="Fortalecimiento tren superior">Tren superior</option>
-              <option value="Fortalecimiento tren inferior">Tren inferior</option>
-              <option value="Potencia y capacidad anaeróbica">Potencia</option>
-            </select>
+        </div>
+        <div class="cond-block" style="margin-top:8px">
+          <div class="cond-label">👥 Tamaño del grupo</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input id="f-group-size" type="number" min="1" max="30" value="8" class="cond-select" style="width:80px">
+            <span style="font-size:12px;color:var(--text3)">personas</span>
           </div>
-          <div class="fg">
-            <label>Objetivo específico</label>
-            <input id="f-obj-esp" type="text" placeholder="Ej: Mejora movilidad tobillo">
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 6: PERFILES (colapsable) ──────────────────── -->
+      <div class="gen-section gen-section-collapsible">
+        <button type="button" class="gen-section-toggle" onclick="_toggleGenSection('gen-profiles-body','gen-profiles-arrow')">
+          <span class="gen-section-hdr" style="margin:0;border:none;padding:0">💾 Perfiles de cliente</span>
+          <span id="gen-profiles-arrow" style="font-size:11px;color:var(--text3)">▶</span>
+        </button>
+        <div id="gen-profiles-body" style="display:none;margin-top:10px">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button onclick="_saveProfile()" style="padding:5px 14px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">💾 Guardar configuración actual</button>
           </div>
-          <div class="fg">
-            <label>👥 Personas en el grupo</label>
-            <input id="f-group-size" type="number" min="1" max="30" value="8" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:15px;font-weight:700;color:#0f172a;width:100%;box-sizing:border-box">
-          </div>
-          <div class="fg full">
-            <label>Equipamiento disponible</label>
-            <div class="chip-group" id="equip-group">
-              <label class="chip sel"><input type="checkbox" value="barbell" checked="">Barra</label>
-              <label class="chip sel"><input type="checkbox" value="dumbbell" checked="">Mancuernas</label>
-              <label class="chip sel"><input type="checkbox" value="kettlebell" checked="">Kettlebell</label>
-              <label class="chip sel"><input type="checkbox" value="cable" checked="">Poleas / Cable</label>
-              <label class="chip sel"><input type="checkbox" value="machine" checked="">Máquinas</label>
-              <label class="chip"><input type="checkbox" value="trx">TRX</label>
-              <label class="chip sel"><input type="checkbox" value="band" checked="">Bandas</label>
-              <label class="chip"><input type="checkbox" value="box">Cajón / Step</label>
-              <label class="chip"><input type="checkbox" value="pullup_bar">Barra dominadas</label>
-              <label class="chip sel"><input type="checkbox" value="foam_roller" checked="">Foam roller</label>
-              <label class="chip"><input type="checkbox" value="ab_wheel">Rueda abdominal</label>
+          <div id="profile-chips-list" style="display:flex;flex-wrap:wrap;gap:6px"><span style="font-size:11px;color:var(--text3);font-style:italic">Sin perfiles guardados</span></div>
+        </div>
+      </div>
+
+      <!-- ── SECCIÓN 7: OBJETIVOS (colapsable) ─────────────────── -->
+      <div class="gen-section gen-section-collapsible" style="border-bottom:none">
+        <button type="button" class="gen-section-toggle" onclick="_toggleGenSection('adv-obj-panel','adv-obj-arrow')">
+          <span class="gen-section-hdr" style="margin:0;border:none;padding:0">🏆 Objetivos de sesión</span>
+          <span id="adv-obj-arrow" style="font-size:11px;color:var(--text3)">▶</span>
+        </button>
+        <div id="adv-obj-panel" style="display:none;margin-top:10px">
+          <div class="form-grid">
+            <div class="fg">
+              <label>Objetivo general</label>
+              <select id="f-obj-gen">
+                <option value="Adaptación anatómica">Adaptación anatómica</option>
+                <option value="Aumento niveles de fuerza">Aumento de fuerza</option>
+                <option value="Desarrollo fuerza funcional">Fuerza funcional</option>
+                <option value="Fortalecimiento tren superior">Tren superior</option>
+                <option value="Fortalecimiento tren inferior">Tren inferior</option>
+                <option value="Potencia y capacidad anaeróbica">Potencia</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Objetivo específico</label>
+              <input id="f-obj-esp" type="text" placeholder="Ej: Mejora movilidad tobillo">
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+    </div><!-- /padding wrapper -->
 
     <!-- Context card (oculto, se muestra desde JS) -->
-    <div id="gen-context-card" style="background: linear-gradient(135deg, rgb(15, 23, 42), rgb(30, 27, 75)); border-radius: 12px; padding: 14px 16px; color: rgb(255, 255, 255); display: block; margin-bottom: 14px;">
+    <div id="gen-context-card" style="background:linear-gradient(135deg,#0f172a,#1e1b4b);border-radius:0 0 12px 12px;padding:16px 18px;display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#a5b4fc">📊 Contexto últimas 5 semanas</div>
-        <button onclick="document.getElementById('gen-context-card').style.display='none'" style="background:none;border:none;color:#64748b;font-size:14px;cursor:pointer;padding:0">✕</button>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#a5b4fc">Contexto de sesión</div>
+        <button onclick="document.getElementById('gen-context-card').style.display='none'" style="background:rgba(255,255,255,.1);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center">✕</button>
       </div>
-      <div id="gen-context-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Balance de patrones (5 sem.)</div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Empuje H ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Tirón H ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Bisagra ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Sentadilla ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Empuje V ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Tirón V ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div><div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:2px"><span>Carry ⚠️</span><span>0%</span></div><div style="background:rgba(255,255,255,.1);border-radius:4px;height:5px"><div style="width:0%;background:#f87171;height:5px;border-radius:4px;transition:width .3s"></div></div></div></div><div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><div style="background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Sesiones / semana</div><div style="font-size:18px;font-weight:700;color:#e0e7ff">3</div></div><div style="background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Tendencia</div><div style="font-size:13px;font-weight:700;color:#fbbf24">→ Estable</div></div><div style="background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Formatos usados</div><div style="font-size:18px;font-weight:700;color:#e0e7ff">1</div></div><div style="background:rgba(255,255,255,.07);border-radius:8px;padding:8px 10px"><div style="font-size:9px;color:#94a3b8;margin-bottom:2px">Sesiones (5 sem.)</div><div style="font-size:18px;font-weight:700;color:#e0e7ff">3</div></div></div><div style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:8px 10px"><div style="font-size:9px;font-weight:700;color:#fca5a5;margin-bottom:3px">⚠️ Patrones infraentrenados</div><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Empuje H</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Tirón H</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Bisagra</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Sentadilla</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Empuje V</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Tirón V</span><span style="font-size:10px;background:rgba(248,113,113,.2);color:#fca5a5;padding:1px 7px;border-radius:20px;margin:2px;display:inline-block">Carry</span></div></div></div><div style="background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px;margin-top:10px"><div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Recomendaciones</div><div style="font-size:10px;color:#c7d2fe;margin-bottom:3px">• Patrones poco trabajados: Empuje Horizontal, Tirón Horizontal, Bisagra, Sentadilla / Lunge, Empuje Vertical, Tirón Vertical, Desplazamientos</div><div style="font-size:10px;color:#c7d2fe;margin-bottom:3px">• Poca variedad de formatos — rota el método de entrenamiento</div></div></div>
+      <div id="gen-context-body"></div>
     </div>
 
-    <!-- Campo notas oculto (lo usa onGenerate internamente) -->
+    <!-- Campos ocultos -->
     <textarea id="f-notes" style="display:none"></textarea>
-    <!-- Campo AI text oculto (compatibilidad) -->
     <textarea id="f-ai-text" style="display:none"></textarea>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <!-- BOTONES -->
+    <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-primary btn-lg" id="btn-gen-main" style="flex:1;min-width:200px" onclick="onGenerateWithCondicionantes()">⚡ Generar Sesión</button>
       <button class="btn btn-secondary btn-lg" style="flex:0 0 auto;padding:14px 20px;font-size:14px;font-weight:700;cursor:pointer" onclick="createManualSession()">✏️ Crear Manual</button>
     </div>
+
   </div>
 </section>
 
 <!-- TAB: SESIÓN GENERADA -->
 <section id="tab-sesion" class="tab-panel">
   <div id="session-output">
-    <div class="sess-hdr plantilla-hdr">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
-        <div>
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:4px">Plantilla de Sesión</div>
-          <h2 style="font-size:20px;margin-bottom:10px">Nº 1 — Adaptación anatómica</h2>
-          
-        </div>
-        <div style="text-align:right">
-          <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.15);color:#e2e8f0">Mes 1 — Adaptación Técnica</span>
-        </div>
-      </div>
-      <div class="sess-meta">
-        <div class="sess-meta-item">👤 Entrenador: <strong>—</strong></div>
-        <div class="sess-meta-item">🏋️ Cliente/Grupo: <strong>—</strong></div>
-        <div class="sess-meta-item">📅 <strong>jueves, 21 de mayo de 2026</strong></div>
-        <div class="sess-meta-item">📊 <strong>Intermedio</strong></div>
-        <div class="sess-meta-item">⏱ <strong>50 min</strong></div>
-        <div class="sess-meta-item">👥 Grupo: <strong>undefined personas</strong></div>
-      </div>
-      <div style="margin-top:10px;font-size:13px;color:#94a3b8">📝 Sesión creada manualmente</div>
-    </div>
-    <div class="int-row">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);letter-spacing:.05em;width:100%;margin-bottom:2px">Intensidad — Mes 1 — Adaptación Técnica · Semana 1</div>
-      <div class="int-item"><div class="int-lbl">% 1RM</div><div class="int-val">50-55%</div></div>
-      <div class="int-sep">·</div>
-      <div class="int-item"><div class="int-lbl">RPE</div><div class="int-val">5-6</div></div>
-      <div class="int-sep">·</div>
-      <div class="int-item"><div class="int-lbl">% FCM</div><div class="int-val">60%</div></div>
-      <div class="int-sep">·</div>
-      <div class="int-item"><div class="int-lbl">RIR</div><div class="int-val">3-4</div></div>
-      <div class="int-sep">·</div>
-      <div class="int-item"><div class="int-lbl">Métodos</div><div style="font-size:12px;font-weight:600;color:var(--text)">Circuito · Intervalos 30/15</div></div>
-    </div>
-
-
-    
-    <div class="edit-mode-banner">✏️ <strong>Modo Edición Global</strong> — Modifica los campos directamente. Pulsa "Guardar cambios" para confirmar.</div>
-    <div class="action-bar">
-      <button class="btn btn-primary" onclick="saveEdits()">✅ Guardar cambios</button>
-      <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar</button>
-    </div>
-
-    <div style="background:linear-gradient(135deg,#1e1b4b,#2b2b2b);border-radius:12px;padding:14px 16px;margin-bottom:14px;color:#fff">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#a5b4fc;margin-bottom:10px">🧠 Lógica de Programación</div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px">
-      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px">
-        <div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Capacidad dominante</div>
-        <div style="font-size:12px;font-weight:700;color:#e0e7ff">Fuerza Funcional</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px">
-        <div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">RIR Objetivo</div>
-        <div style="font-size:12px;font-weight:700;color:#e0e7ff">RIR 2 — Alta intensidad</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px">
-        <div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Densidad</div>
-        <div style="font-size:12px;font-weight:700;color:#7c3aed">media</div>
-      </div>
-      <div style="background:rgba(255,255,255,.08);border-radius:8px;padding:8px 10px">
-        <div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Fatiga esperada</div>
-        <div style="font-size:13px;font-weight:700;color:#fcd34d;letter-spacing:.1em">★★★☆☆</div>
-      </div>
-    </div>
-    <div style="background:rgba(255,255,255,.05);border-radius:8px;padding:8px 12px">
-      <div style="font-size:9px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Objetivo fisiológico</div>
-      <div style="font-size:11px;color:#c7d2fe;line-height:1.5">Desarrollo de fuerza funcional y condición general</div>
-    </div>
-    
-  </div>
-
-    <div class="phase ph-mov">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🟢 Movilidad y Correctivos</div>
-        <div class="phase-time">8-10 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('movilidad')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="phase ph-core">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🟡 Core — Estabilidad Proximal</div>
-        <div class="phase-time">8 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="fmt-card" style="background:linear-gradient(135deg,#fef9c3,#fefce8);border-left:4px solid #d97706;margin-bottom:10px;padding:10px 14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-      <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#92400e;margin-bottom:3px">Formato Fijo</div>
-        <div style="font-size:14px;font-weight:700;color:#78350f">4 ej × 30'' trabajo / 10'' transición · 3 vueltas</div>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#fef3c7;color:#92400e">Anti-extensión</span>
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#ede9fe;color:#5b21b6">Anti-rotación</span>
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#dcfce7;color:#166534">Anti-flex. lateral</span>
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#e0f2fe;color:#075985">Isométrico</span>
-      </div>
-    </div>
-    <div style="font-size:11px;color:#92400e;margin-top:6px">Objetivo: rigidez proximal, estabilidad lumbo-pélvica y transferencia a patrones globales · ~8 min</div>
-  </div><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('core')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="phase ph-act">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🔵 Activación Específica</div>
-        <div class="phase-time">4-5 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('activacion')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="phase ph-str">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🔴 Bloque Principal — Fuerza Full Body</div>
-        <div class="phase-time">18-20 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="fmt-card fmt-card-str" style="padding:12px 14px">
-    <div class="fmt-tag" style="background:var(--str-l);color:var(--str);margin-bottom:8px">✏️ Editar método de fuerza</div>
-    <div style="display:grid;gap:8px">
-      <div>
-        <label style="font-size:10px;font-weight:700;color:var(--str);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">Método de entrenamiento</label>
-        <select id="str-fmt-selector" onchange="previewStrFmt()" style="width:100%;padding:7px 10px;border:1.5px solid #fca5a5;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;color:var(--str);background:#fff;cursor:pointer">
-          <option value="emom">EMOM por Estaciones</option><option value="e2mom">E2MOM Mecánico</option><option value="e3mom">E3MOM — Fuerza Máxima</option><option value="amrap">3× AMRAP</option><option value="density_block">Density Challenge</option><option value="circuit" selected="">Circuito por Rondas</option><option value="superset">Superseries Antagonistas</option><option value="ladder">Escalera de Reps</option><option value="hybrid_intervals">Intervalos Híbridos</option><option value="fortime">For Time — Reto Grupal</option><option value="interval_str">Intervalos de Fuerza 40/20</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:8px;align-items:flex-end">
-        <div style="flex:1">
-          <label style="font-size:10px;font-weight:700;color:var(--str);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">Reps / tiempo por ejercicio</label>
-          <input id="str-reps-global" style="width:100%;padding:7px 10px;border:1.5px solid #fca5a5;border-radius:7px;font-family:inherit;font-size:13px;box-sizing:border-box" value="10" placeholder="ej: 10 reps, 40s, 3×8...">
-        </div>
-        <button onclick="applyStrFormat()" style="flex-shrink:0;padding:7px 16px;background:var(--str);color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Aplicar ✓</button>
-      </div>
-      <div>
-        <label style="font-size:10px;font-weight:700;color:var(--str);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">Comentario del método</label>
-        <textarea class="edit-input edit-cues-input" data-edit-path="fuerza.desc" id="str-fmt-preview" style="min-height:60px">Circuito de ejercicios</textarea>
-      </div>
-    </div>
-  </div><div class="vol-row">
-    <div class="vol-item"><div class="vl">Ejercicios</div><div class="vv">0</div></div>
-    <div class="vol-item"><div class="vl">Patrones</div><div class="vv">0</div></div>
-    <div class="vol-item"><div class="vl">RIR objetivo</div><div class="vv">RIR 2</div></div>
-    <div class="vol-item"><div class="vl">Densidad</div><div class="vv">media</div></div>
-  </div><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('fuerza')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="phase ph-hit">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🟣 HIIT Cardiovascular</div>
-        <div class="phase-time">5-7 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="fmt-card fmt-card-hit">
-    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px">
-      <div class="fmt-tag" style="background:var(--hit-l);color:var(--hit);margin-bottom:0">6 min</div>
-      
-    </div>
-    <div class="fmt-title" style="color:var(--hit)">Intervalos 30/15</div>
-    <div style="margin-top:6px"><label style="font-size:10px;font-weight:700;color:var(--hit);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">Comentario del método</label><textarea class="edit-input edit-cues-input" data-edit-path="hiit.format.desc" style="min-height:55px">30s trabajo máximo / 15s descanso activo. 8 rondas. Alta potencia.</textarea></div>
-  </div><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('hiit')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="phase ph-cool">
-      <div class="phase-hdr" onclick="togglePhase(this)">
-        <div class="phase-dot"></div>
-        <div class="phase-name">🟢 Vuelta a la Calma</div>
-        <div class="phase-time">3-5 min</div>
-        
-        <span class="chevron">▾</span>
-      </div>
-      <div class="phase-body"><div class="ex-add-row"><button class="ex-add-phase-btn" onclick="openExPicker('cooldown')">+ Añadir ejercicio</button></div></div>
-    </div>
-    <div class="class-card-wrap open" id="class-card-content">
-    <div style="background:linear-gradient(135deg,#1e1b4b,#312e81);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-      <div>
-        <div style="font-size:15px;font-weight:800;color:#fff">📋 Ficha de Clase</div>
-        <div style="font-size:11px;color:#c7d2fe;margin-top:2px">jueves, 21 de mayo · 44 min</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <span class="cc-group-badge">👥 8 personas</span>
-        <button onclick="window.print()" style="padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);color:#fff">🖨️ Imprimir</button>
-      </div>
-    </div>
-    
-    <div class="cc-scale-legend" style="margin:8px 10px 0;border-radius:8px">
-      <strong>★ Nivel alto</strong> = variante más exigente &nbsp;·&nbsp; <strong>☆ Nivel bajo</strong> = variante accesible &nbsp;·&nbsp; Asigna según nivel de cada persona
-    </div>
-    <div class="cc-block">
-      <div class="cc-block-hdr" style="background:#0ea5e9;color:#0c4a6e">
-      <span class="cc-block-time">00:00 – 00:00</span>
-      <span style="flex:1">🔵 MOVILIDAD</span>
-      <span style="font-size:10px;opacity:.75">0 min</span>
-    </div>
-      <div class="cc-block-body"></div>
-    </div><div class="cc-block">
-      <div class="cc-block-hdr" style="background:#10b981;color:#064e3b">
-      <span class="cc-block-time">00:00 – 00:00</span>
-      <span style="flex:1">🟢 ACTIVACIÓN</span>
-      <span style="font-size:10px;opacity:.75">0 min</span>
-    </div>
-      <div class="cc-block-body"></div>
-    </div><div class="cc-block">
-      <div class="cc-block-hdr" style="background:#f59e0b;color:#713f12">
-      <span class="cc-block-time">00:00 – 08:00</span>
-      <span style="flex:1">🟡 CORE · 3 rondas × 30s/10s</span>
-      <span style="font-size:10px;opacity:.75">8 min</span>
-    </div>
-      <div class="cc-block-body"></div>
-    </div><div class="cc-block">
-    <div class="cc-block-hdr" style="background:#ef4444;color:#fff">
-      <span class="cc-block-time">08:00 – 28:00</span>
-      <span style="flex:1">🔴 FUERZA · Circuito</span>
-      <span style="font-size:10px;opacity:.75">20 min</span>
-    </div>
-    <div class="cc-block-body">
-      
-      <div class="cc-rotation-note">
-        🔄 <strong>8 personas · 1 estaciones · 8/estación</strong>
-        &nbsp;·&nbsp; 40s trabajo + 20s transición
-        &nbsp;·&nbsp; 3 rondas (~3 min)
-        <br>Grupos: <strong>A</strong> (8p) → Est.1
-      </div>
-    </div>
-  </div><div class="cc-block">
-    <div class="cc-block-hdr" style="background:#7c3aed;color:#fff">
-      <span class="cc-block-time">28:00 – 38:00</span>
-      <span style="flex:1">🟣 HIIT · </span>
-      <span style="font-size:10px;opacity:.75">10 min</span>
-    </div>
-    <div class="cc-block-body"></div>
-  </div><div class="cc-block">
-      <div class="cc-block-hdr" style="background:#10b981;color:#064e3b">
-      <span class="cc-block-time">38:00 – 44:00</span>
-      <span style="flex:1">🟢 VUELTA A LA CALMA</span>
-      <span style="font-size:10px;opacity:.75">6 min</span>
-    </div>
-      <div class="cc-block-body"></div>
-    </div>
-  </div>
+    <div class="empty"><h3>Sin sesión generada</h3><p>Ve a Generar y configura los parámetros</p></div>
   </div>
 </section>
 
@@ -1248,7 +1132,7 @@ O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar gras
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
         <div class="card-title" style="margin:0">Historial de Sesiones</div>
-        <div id="hist-count" style="font-size:12px;color:var(--text2);margin-top:3px">3 sesiónes · 1 semana</div>
+        <div id="hist-count" style="font-size:12px;color:var(--text2);margin-top:3px">4 sesiónes · 1 semana</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-secondary" onclick="exportBackup()">⬇ Descargar copia</button>
@@ -1260,10 +1144,10 @@ O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar gras
       <div class="week-group-hdr">
         <div>
           <div class="week-group-title">📅 Semana del 18 de mayo al 24 de mayo de 2026</div>
-          <div class="week-group-meta">3 sesiónes · 0 ejercicios de fuerza en total</div>
+          <div class="week-group-meta">4 sesiónes · 0 ejercicios de fuerza en total</div>
           <div class="week-group-badges"></div>
         </div>
-        <div style="font-size:22px;letter-spacing:4px">⚡ ⚡ ⚡</div>
+        <div style="font-size:22px;letter-spacing:4px">⚡ ⚡ ⚡ ⚡</div>
       </div>
       <div class="hist-item" onclick="loadHistSession(0)">
         <div class="hist-item-type">⚡</div>
@@ -1289,6 +1173,14 @@ O más simple: «Principiante, solo tiene mancuernas en casa, quiere quemar gras
           
         </div>
         <button class="btn btn-danger" onclick="event.stopPropagation();deleteSession(2)" style="padding:6px 10px;font-size:12px;flex-shrink:0">🗑</button>
+      </div><div class="hist-item" onclick="loadHistSession(3)">
+        <div class="hist-item-type">⚡</div>
+        <div class="hist-info">
+          <div class="hist-title">Jueves, 21 may</div>
+          <div class="hist-sub">Entrenamiento · Circuito · 0 ejercicios · Intermedio</div>
+          
+        </div>
+        <button class="btn btn-danger" onclick="event.stopPropagation();deleteSession(3)" style="padding:6px 10px;font-size:12px;flex-shrink:0">🗑</button>
       </div>
     </div></div>
   </div>
@@ -1849,7 +1741,7 @@ Ejemplos:
 </section>
 
 <!-- EXERCISE PICKER MODAL -->
-<div id="ex-picker-modal" class="ai-modal-overlay" style="display: none;" onclick="if(event.target===this)closeExPicker()">
+<div id="ex-picker-modal" class="ai-modal-overlay" style="display:none" onclick="if(event.target===this)closeExPicker()">
   <div class="ex-picker-box">
     <div class="ex-picker-hdr">
       <span style="font-size:14px;font-weight:800" id="ex-picker-title">+ Añadir ejercicio</span>
@@ -1871,7 +1763,7 @@ Ejemplos:
       <button class="ex-picker-filt" onclick="filterExPicker('hiit',this)">HIIT</button>
     </div>
     <input type="text" class="ex-picker-search" id="ex-picker-search" placeholder="Buscar por nombre, patrón, material, nivel…" oninput="clearTimeout(window._exPickT);window._exPickT=setTimeout(renderExPickerList,180)">
-    <div class="ex-picker-list" id="ex-picker-list"><div style="text-align:center;padding:32px 16px;color:var(--text3)"><div style="font-size:32px;margin-bottom:8px">🔍</div><div style="font-size:13px;font-weight:700;color:var(--text2)">Busca por nombre, patrón o material</div><div style="font-size:12px;margin-top:6px;color:var(--text3)">Ej: <em>"bisagra barra"</em> · <em>"mancuerna principiante"</em> · <em>"peso corporal"</em></div></div></div>
+    <div class="ex-picker-list" id="ex-picker-list"></div>
     <div class="manual-ex-section">
       <button class="manual-ex-toggle" id="manual-ex-toggle" onclick="toggleManualExForm()">
         <span id="manual-ex-arrow">▶</span> Crear ejercicio personalizado
@@ -2062,7 +1954,7 @@ Ejemplos:
 </div>
 
 </main>
-<div class="toast" id="toast">✏️ Sesión manual creada y guardada — añade los ejercicios con + Añadir</div>
+<div class="toast" id="toast"></div>
 <div id="print-overlay"></div>
 
 <script>
@@ -7475,15 +7367,21 @@ function generateSession(params){
   // 1. Movilidad — 1 ejercicio por área: hombro, dorsal, cadera, tobillo
   const movilidad=pickMobilidad(level,equipment,recentNames);
 
-  // 2. Core — 1 ejercicio por cada uno de los 4 patrones de McGill
+  // 2. Core — 4 ejercicios: 1 anti-extensión, 1 anti-rotación, 1 anti-flex lateral + 1 anti-extensión variante
+  // Formato fijo: 3 vueltas × 30'' trabajo / 10'' transición
   // (pickFrom ya respeta isBlockedByNotes que incluye noSupine/noProne)
-  const coreCats=["isometrico","antiextension","antiflexion_lateral","antirotacion"];
+  const coreSlots=[
+    {cat:"antiextension",   label:"Anti-extensión"},
+    {cat:"antirotacion",    label:"Anti-rotación"},
+    {cat:"antiflexion_lateral", label:"Anti-flex. lateral"},
+    {cat:"antiextension",   label:"Anti-extensión II"}
+  ];
   const usedCore=new Set();
-  const core=coreCats.map(cat=>{
-    const pool=DB.core.filter(e=>e.cat===cat);
+  const core=coreSlots.map(slot=>{
+    const pool=DB.core.filter(e=>e.cat===slot.cat);
     const e=pickFrom(pool,level,equipment,usedCore,recentNames);
     if(e)usedCore.add(e.name);
-    return e?{...e,corePatternLabel:{isometrico:"Isométrico",antiextension:"Anti-extensión",antiflexion_lateral:"Anti-flex. lateral",antirotacion:"Anti-rotación"}[cat]}:null;
+    return e?{...e, dose:"30''", corePatternLabel:slot.label}:null;
   }).filter(Boolean);
 
   // 3. Activacion
@@ -7999,14 +7897,14 @@ function renderSession(sess){
   const coreFormatCard=`<div class="fmt-card" style="background:linear-gradient(135deg,#fef9c3,#fefce8);border-left:4px solid #d97706;margin-bottom:10px;padding:10px 14px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
       <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#92400e;margin-bottom:3px">Formato Fijo</div>
-        <div style="font-size:14px;font-weight:700;color:#78350f">4 ej × 30'' trabajo / 10'' transición · 3 vueltas</div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#92400e;margin-bottom:3px">Circuito de Core · McGill</div>
+        <div style="font-size:14px;font-weight:700;color:#78350f">3 vueltas · 30'' trabajo / 10'' transición</div>
+        <div style="font-size:11px;color:#92400e;margin-top:3px">Ejecuta los 4 ejercicios seguidos y descansa 60'' entre vueltas</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#fef3c7;color:#92400e">Anti-extensión</span>
+        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#fef3c7;color:#92400e">Anti-extensión ×2</span>
         <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#ede9fe;color:#5b21b6">Anti-rotación</span>
         <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#dcfce7;color:#166534">Anti-flex. lateral</span>
-        <span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;background:#e0f2fe;color:#075985">Isométrico</span>
       </div>
     </div>
     <div style="font-size:11px;color:#92400e;margin-top:6px">Objetivo: rigidez proximal, estabilidad lumbo-pélvica y transferencia a patrones globales · ~8 min</div>
@@ -13255,14 +13153,18 @@ function regenSection(sectionKey){
       sess.blocks.movilidad=pickMobilidad(level,equipment,recentNames);
       break;
     case"core":{
-      var coreCats=["isometrico","antiextension","antiflexion_lateral","antirotacion"];
+      var coreSlots=[
+        {cat:"antiextension",      label:"Anti-extensión"},
+        {cat:"antirotacion",       label:"Anti-rotación"},
+        {cat:"antiflexion_lateral",label:"Anti-flex. lateral"},
+        {cat:"antiextension",      label:"Anti-extensión II"}
+      ];
       var usedCore=new Set();
-      var coreLabels={isometrico:"Isométrico",antiextension:"Anti-extensión",antiflexion_lateral:"Anti-flex. lateral",antirotacion:"Anti-rotación"};
-      sess.blocks.core=coreCats.map(function(cat){
-        var pool=DB.core.filter(function(e){return e.cat===cat;});
+      sess.blocks.core=coreSlots.map(function(slot){
+        var pool=DB.core.filter(function(e){return e.cat===slot.cat;});
         var ex=pickFrom(pool,level,equipment,usedCore,recentNames);
         if(ex) usedCore.add(ex.name);
-        return ex?Object.assign({},ex,{corePatternLabel:coreLabels[cat]}):null;
+        return ex?Object.assign({},ex,{dose:"30''",corePatternLabel:slot.label}):null;
       }).filter(Boolean);
       break;}
     case"activacion":
@@ -13452,6 +13354,127 @@ function _toggleAdvGen(btn){
 }
 
 // ── Detect equipment from free text and apply to checkboxes ──────────────
+
+// ── Chip-based session config ────────────────────────────────────────────────
+function _setRadioChip(groupId, selectId, value){
+  document.querySelectorAll('#'+groupId+' .radio-chip').forEach(function(b){
+    b.classList.toggle('active', b.dataset.value===value);
+  });
+  var sel=document.getElementById(selectId);
+  if(sel) sel.value=value;
+}
+function _toggleRestriction(btn){
+  btn.classList.toggle('active');
+}
+function _toggleAdvObj(btn){
+  var panel=document.getElementById('adv-obj-panel');
+  var arrow=document.getElementById('adv-obj-arrow');
+  var open=panel.style.display==='block';
+  panel.style.display=open?'none':'block';
+  arrow.textContent=open?'▶':'▼';
+}
+function _toggleGenSection(panelId, arrowId){
+  var panel=document.getElementById(panelId);
+  var arrow=document.getElementById(arrowId);
+  if(!panel) return;
+  var open=panel.style.display==='block'||panel.style.display==='flex';
+  panel.style.display=open?'none':'block';
+  if(arrow) arrow.textContent=open?'▶':'▼';
+}
+
+// Profiles
+const _PROFILES_KEY='gp_profiles_v2';
+function _getProfileConfig(){
+  var restrictions=[];
+  document.querySelectorAll('#chips-restrictions .restriction-chip.active').forEach(function(c){restrictions.push(c.dataset.keyword);});
+  var equipment=[];
+  document.querySelectorAll('#equip-group input:checked').forEach(function(cb){equipment.push(cb.value);});
+  return {
+    level:document.getElementById('f-level').value,
+    focus:document.getElementById('f-focus').value,
+    strFormat:document.getElementById('f-str').value,
+    hiitFormat:document.getElementById('f-hiit').value,
+    groupSize:document.getElementById('f-group-size').value,
+    restrictions:restrictions,
+    equipment:equipment,
+    objGen:(document.getElementById('f-obj-gen')||{}).value||'',
+    objEsp:(document.getElementById('f-obj-esp')||{}).value||''
+  };
+}
+function _applyProfileConfig(p){
+  if(p.level) _setRadioChip('chips-level','f-level',p.level);
+  if(p.focus) _setRadioChip('chips-focus','f-focus',p.focus);
+  if(p.strFormat) document.getElementById('f-str').value=p.strFormat;
+  if(p.hiitFormat) document.getElementById('f-hiit').value=p.hiitFormat;
+  if(p.groupSize) document.getElementById('f-group-size').value=p.groupSize;
+  if(p.objGen&&document.getElementById('f-obj-gen')) document.getElementById('f-obj-gen').value=p.objGen;
+  if(p.objEsp&&document.getElementById('f-obj-esp')) document.getElementById('f-obj-esp').value=p.objEsp;
+  document.querySelectorAll('#chips-restrictions .restriction-chip').forEach(function(c){
+    c.classList.toggle('active',(p.restrictions||[]).includes(c.dataset.keyword));
+  });
+  if(p.equipment){
+    document.querySelectorAll('#equip-group input[type=checkbox]').forEach(function(cb){
+      cb.checked=p.equipment.includes(cb.value);
+    });
+  }
+  showToast('Perfil cargado');
+}
+function _saveProfile(){
+  var name=prompt('Nombre del perfil (ej: "Mario — rodilla", "Grupo lunes"):');
+  if(!name||!name.trim()) return;
+  name=name.trim();
+  var profiles={};
+  try{profiles=JSON.parse(localStorage.getItem(_PROFILES_KEY)||'{}');}catch(e){}
+  profiles[name]=_getProfileConfig();
+  localStorage.setItem(_PROFILES_KEY,JSON.stringify(profiles));
+  _renderProfileChips();
+  showToast('✅ Perfil "'+name+'" guardado');
+}
+function _deleteProfile(name){
+  if(!confirm('¿Eliminar el perfil "'+name+'"?')) return;
+  var profiles={};
+  try{profiles=JSON.parse(localStorage.getItem(_PROFILES_KEY)||'{}');}catch(e){}
+  delete profiles[name];
+  localStorage.setItem(_PROFILES_KEY,JSON.stringify(profiles));
+  _renderProfileChips();
+}
+function _loadProfile(name){
+  var profiles={};
+  try{profiles=JSON.parse(localStorage.getItem(_PROFILES_KEY)||'{}');}catch(e){}
+  _applyProfileConfig(profiles[name]||{});
+}
+function _renderProfileChips(){
+  var container=document.getElementById('profile-chips-list');
+  if(!container) return;
+  var profiles={};
+  try{profiles=JSON.parse(localStorage.getItem(_PROFILES_KEY)||'{}');}catch(e){}
+  var names=Object.keys(profiles);
+  if(!names.length){
+    container.innerHTML='<span style="font-size:11px;color:var(--text3);font-style:italic">Sin perfiles guardados</span>';
+    return;
+  }
+  container.innerHTML=names.map(function(n){
+    var safeAttr=n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<span class="profile-chip">'
+      +'<span onclick="_loadProfile(\''+safeAttr+'\')">'+n+'</span>'
+      +'<button class="profile-chip-del" onclick="_deleteProfile(\''+safeAttr+'\')" title="Eliminar">✕</button>'
+      +'</span>';
+  }).join('');
+}
+// Render profiles on load
+document.addEventListener('DOMContentLoaded',function(){_renderProfileChips();});
+
+// Override onGenerateWithCondicionantes — read chips, populate f-notes, generate
+async function onGenerateWithCondicionantes(){
+  var restrictions=[];
+  document.querySelectorAll('#chips-restrictions .restriction-chip.active').forEach(function(c){
+    restrictions.push(c.dataset.keyword);
+  });
+  var notesEl=document.getElementById('f-notes');
+  if(notesEl) notesEl.value=restrictions.join(', ');
+  onGenerate();
+}
+
 function _applyEquipmentFromText(txt){
   if(!txt) return;
   const t=txt.toLowerCase();
@@ -13506,145 +13529,6 @@ function _applyEquipmentFromText(txt){
   });
 }
 
-// ── GENERAR CON CONDICIONANTES (nuevo flujo unificado) ────────────────────
-async function onGenerateWithCondicionantes(){
-  var condTxt=(document.getElementById("f-condicionantes")||{}).value||"";
-  condTxt=condTxt.trim();
-  var btn=document.getElementById("btn-gen-main");
-  var loadEl=document.getElementById("gen-ai-loading");
-  var resultEl=document.getElementById("gen-ai-result");
-
-  // Sync condicionantes to hidden fields used by onGenerate
-  var notesEl=document.getElementById("f-notes");
-  var aiEl=document.getElementById("f-ai-text");
-  if(notesEl) notesEl.value=condTxt;
-  if(aiEl) aiEl.value="";
-
-  // Check if AI key is available
-  var provider=localStorage.getItem("activ_ai_provider")||"groq";
-  var hasKey=!!localStorage.getItem(_providerKeyName(provider));
-
-  if(condTxt && hasKey){
-    btn.disabled=true;
-    btn.textContent="🔬 Analizando evidencia...";
-    if(loadEl) loadEl.style.display="flex";
-    if(resultEl) resultEl.style.display="none";
-
-    // ── STEP 1: Config analysis (sets form fields) ──────────────────────────
-    var promptConfig='Eres un arquitecto de programación de entrenamiento funcional. Analiza la descripción y devuelve SOLO un JSON válido:\n'+
-      '{\n'+
-      '  "level": "beginner"|"intermediate"|"advanced",\n'+
-      '  "focus": "full_body"|"upper"|"lower",\n'+
-      '  "strFormat": "random"|"emom"|"e2mom"|"e3mom"|"amrap"|"density_block"|"circuit"|"superset"|"ladder"|"hybrid_intervals"|"fortime"|"interval_str",\n'+
-      '  "hiitFormat": "random"|"tabata"|"sprint_intervals"|"interval30"|"amrap_hit"|"emom_hit"|"circuit40"|"pyramid",\n'+
-      '  "objGen": "texto breve del objetivo general",\n'+
-      '  "objEsp": "objetivo específico de sesión o vacío",\n'+
-      '  "notes": "SOLO palabras clave de LESIONES/CONTRAINDICACIONES médicas separadas por coma (omite si no hay): rodilla, hombro, lumbar, codo, tobillo, cuello, embarazo, cardio suave. NO incluyas aquí formato ni objetivos.",\n'+
-      '  "equipment": ["barbell","dumbbell","kettlebell","cable","machine","trx","band","box","pullup_bar","foam_roller","ab_wheel"] — lista SOLO el material que el cliente tiene disponible. Si no se menciona ninguno concreto, incluye todos. Si dice SOLO un tipo (ej: solo mancuernas), lista únicamente ese,\n'+
-      '  "summary": "1-2 frases justificando las elecciones, en español"\n'+
-      '}\n\nDescripción: '+condTxt+'\n\nResponde ÚNICAMENTE con el JSON.';
-
-    var configData={};
-    try{
-      var rawCfg=await callClaudeAI(promptConfig);
-      var cfgStr=rawCfg.replace(/```json?\s*/gi,"").replace(/```/g,"").trim();
-      configData=JSON.parse(cfgStr);
-
-      var setS=function(id,val){var e=document.getElementById(id);if(e&&val)e.value=val;};
-      setS("f-level",configData.level);
-      setS("f-focus",configData.focus);
-      setS("f-str",configData.strFormat);
-      setS("f-hiit",configData.hiitFormat);
-      if(configData.objGen) setS("f-obj-gen",configData.objGen);
-      if(configData.objEsp) setS("f-obj-esp",configData.objEsp);
-      // Store ONLY the AI-extracted safety/medical keywords in f-notes.
-      // Do NOT store the full condTxt: parseSessionNotes would re-read it and
-      // override format/focus that the AI already correctly set in the form fields.
-      if(notesEl) notesEl.value=configData.notes||"";
-
-      if(Array.isArray(configData.equipment) && configData.equipment.length>0){
-        document.querySelectorAll("#equip-group input[type=checkbox]").forEach(function(cb){
-          cb.checked=configData.equipment.includes(cb.value);
-          cb.closest(".chip").classList.toggle("sel",cb.checked);
-        });
-      }
-
-      if(resultEl && configData.summary){
-        resultEl.innerHTML='<strong>✅ Sesión configurada</strong> · '+
-          (configData.level==="beginner"?"Principiante":configData.level==="advanced"?"Avanzado":"Intermedio")+
-          ' · '+(configData.focus==="full_body"?"Cuerpo completo":configData.focus==="upper"?"Tren superior":"Tren inferior")+
-          '<br><span style="font-size:11px;color:var(--text2)">'+configData.summary+'</span>';
-        resultEl.style.display="block";
-      }
-    }catch(err){
-      console.warn("[AI] config analysis failed:",err.message);
-      if(resultEl){
-        resultEl.innerHTML='<span style="color:#92400e">⚠ IA no disponible — sesión generada con análisis de palabras clave</span>';
-        resultEl.style.display="block";
-      }
-    }
-
-    if(loadEl) loadEl.style.display="none";
-    btn.disabled=false;
-    btn.textContent="⚡ Generar Sesión";
-
-    // ── STEP 2: Open evidence modal (loading state) then fetch evidence ─────
-    _openEvModal();
-
-    var promptEv='Eres un experto en medicina del ejercicio y ciencias del deporte. Tienes acceso a la evidencia más actualizada (Cochrane, ACSM, OARSI, EULAR, JOSPT CPG, ADA, BJSM).\n\n'+
-      'Analiza este caso clínico/deportivo y devuelve SOLO un JSON válido con esta estructura exacta:\n'+
-      '{\n'+
-      '  "caso": "resumen conciso del perfil en 1 frase",\n'+
-      '  "contraindicadoTotal": [\n'+
-      '    {"item": "ejercicio o acción absolutamente contraindicada", "razon": "justificación científica breve con referencia"}\n'+
-      '  ],\n'+
-      '  "contraindicadoParcial": [\n'+
-      '    {"item": "ejercicio o acción a modificar", "condicion": "bajo qué condición específica es seguro realizarlo"}\n'+
-      '  ],\n'+
-      '  "recomendado": [\n'+
-      '    {"item": "ejercicio o enfoque recomendado", "evidencia": "fuente breve ej: Cochrane 2015, ACSM 2022"}\n'+
-      '  ],\n'+
-      '  "planPrevisto": {\n'+
-      '    "formato": "formato elegido y por qué es óptimo para este caso",\n'+
-      '    "volumen": "series×reps o tiempo con justificación (ej: 3×12-15 al 60-70% 1RM — ACSM 2009)",\n'+
-      '    "intensidad": "nivel y porqué (RPE, %1RM, etc.)",\n'+
-      '    "duracion": "duración estimada de la sesión completa"\n'+
-      '  },\n'+
-      '  "objetivos": [\n'+
-      '    "objetivo 1 específico y medible",\n'+
-      '    "objetivo 2",\n'+
-      '    "objetivo 3 (opcional)"\n'+
-      '  ],\n'+
-      '  "justificacion": "párrafo de 3-5 frases explicando POR QUÉ esta planificación (y no otra) es la más adecuada, con referencias a guías clínicas o meta-análisis recientes"\n'+
-      '}\n\n'+
-      'Condicionantes del caso: '+condTxt+'\n\n'+
-      'IMPORTANTE: Si no hay contraindicaciones, devuelve arrays vacíos. Responde ÚNICAMENTE con el JSON, sin texto adicional.';
-
-    try{
-      var rawEv=await callClaudeAI(promptEv);
-      var evStr=rawEv.replace(/```json?\s*/gi,"").replace(/```/g,"").trim();
-      var evData=JSON.parse(evStr);
-      _renderEvidenceModal(evData);
-    }catch(errEv){
-      console.warn("[AI] evidence analysis failed:",errEv.message);
-      _renderEvidenceModalFallback(condTxt);
-    }
-
-  } else if(condTxt && !hasKey){
-    if(resultEl){
-      resultEl.innerHTML='<span style="color:#92400e">💡 Sin clave IA — sesión generada adaptando las condiciones por palabras clave. Configura tu API key en ✨ IA para análisis completo.</span>';
-      resultEl.style.display="block";
-    }
-    // No AI — apply equipment detection from text before generating
-    _applyEquipmentFromText(condTxt);
-    onGenerate();
-  } else {
-    // No condicionantes text — generate directly
-    onGenerate();
-  }
-}
-
-// ── Evidence modal helpers ─────────────────────────────────────────────────
 function _openEvModal(){
   var ov=document.getElementById("ev-modal-overlay");
   if(ov){ov.classList.add("open");ov.scrollTop=0;}
@@ -15245,8 +15129,15 @@ function _applyProtocol(id, target){
   var cond=p.condicionantes||p.description;
 
   if(target==="gen"){
-    var el=document.getElementById("f-condicionantes");
-    if(el) el.value="["+p.name+"] "+cond;
+    // Apply restrictions from protocol to restriction chips
+    var condLower=(cond||"").toLowerCase();
+    var kwMap={rodilla:"rodilla",hombro:"hombro",lumbar:"lumbar",tobillo:"tobillo",embarazo:"embarazo",cuello:"cuello"};
+    document.querySelectorAll('#chips-restrictions .restriction-chip').forEach(function(c){
+      var kw=c.dataset.keyword;
+      c.classList.toggle('active',condLower.indexOf(kw)!==-1);
+    });
+    var notesEl=document.getElementById("f-notes");
+    if(notesEl) notesEl.value=cond;
     var lvl=document.getElementById("f-level"); if(lvl) lvl.value=levelMap[p.level]||p.level;
     var foc=document.getElementById("f-focus"); if(foc) foc.value=focusMap[p.focus]||p.focus;
     if(p.equipment&&p.equipment.length>0){
@@ -15442,4 +15333,4 @@ function _closeProtoFormModal(evt){
 
 
 
-<div id="_fs-badge" style="position: fixed; bottom: 20px; right: 20px; background: rgb(30, 41, 59); color: rgb(226, 232, 240); font-size: 11px; font-weight: 700; padding: 7px 16px; border-radius: 20px; z-index: 99999; transition: opacity 0.4s; box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 12px; pointer-events: none; opacity: 0;">✓ Guardado en la nube</div></body></html>
+<div id="_fs-badge" style="position: fixed; bottom: 20px; right: 20px; background: rgb(30, 41, 59); color: rgb(226, 232, 240); font-size: 11px; font-weight: 700; padding: 7px 16px; border-radius: 20px; z-index: 99999; transition: opacity 0.4s; box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 12px; pointer-events: none; opacity: 0;">✓ Datos sincronizados</div></body></html>
