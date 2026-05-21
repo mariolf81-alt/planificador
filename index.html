@@ -80,6 +80,31 @@ textarea{resize:vertical;min-height:70px}
 .ex-content{flex:1}
 .ex-name{font-weight:600;font-size:14px;margin-bottom:2px}
 .ex-name-es{color:var(--text3);font-size:11px;font-style:italic;font-weight:400}
+/* ── Video link system ── */
+.ex-video-btn{display:inline-flex;align-items:center;gap:3px;padding:1px 7px 2px;background:#7c3aed;color:#fff;border:none;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;vertical-align:middle;margin-left:6px;line-height:1.5;transition:background .15s;flex-shrink:0}
+.ex-video-btn:hover{background:#6d28d9}
+.ex-video-btn svg{width:9px;height:9px;fill:currentColor;flex-shrink:0}
+#video-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px}
+#video-modal-overlay.open{display:flex}
+#video-modal-box{background:#1e1b4b;border-radius:14px;overflow:hidden;width:100%;max-width:700px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+#video-modal-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px}
+#video-modal-name{font-size:13px;font-weight:700;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
+#video-modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#video-modal-close:hover{background:rgba(255,255,255,.25)}
+#video-modal-ratio{position:relative;padding-top:56.25%;background:#000}
+#video-modal-ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+#video-modal-ftr{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(0,0,0,.3)}
+#video-modal-ftr a{font-size:11px;color:#a5b4fc;text-decoration:none}
+#video-modal-ftr a:hover{text-decoration:underline}
+/* Video link field in DB editor modal */
+.ex-video-field{display:flex;align-items:center;gap:7px;padding:7px 10px;background:#f5f3ff;border-radius:8px;border:1.5px solid #ddd6fe}
+.ex-video-field input{flex:1;border:none;background:transparent;font-size:12px;font-family:inherit;color:var(--text);outline:none}
+.ex-video-field input::placeholder{color:#a78bfa}
+.ex-video-field-lbl{font-size:10px;font-weight:700;color:#7c3aed;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.ex-video-linked{font-size:10px;color:#059669;font-weight:600}
+/* Video bulk import panel */
+#video-bulk-panel{background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:10px;padding:14px;margin-top:12px;display:none}
+#video-bulk-panel.open{display:block}
 .ex-detail{font-size:12px;color:var(--text2);margin-bottom:3px}
 .ex-cues{font-size:11px;color:var(--text3);font-style:italic}
 .pattern-pill{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:1px 6px;border-radius:4px;background:var(--str-l);color:var(--str);margin-right:5px}
@@ -996,11 +1021,47 @@ textarea{resize:vertical;min-height:70px}
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <input id="db-search" type="search" placeholder="🔍 Buscar..." oninput="renderDBEditor(window._dbFilter||'all')" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;width:180px">
         <button onclick="openExModal(null,null)" class="btn btn-primary" style="white-space:nowrap">+ Añadir</button>
+        <button onclick="toggleVideoBulkPanel()" class="btn btn-secondary" style="white-space:nowrap;font-size:12px;background:#f5f3ff;border-color:#ddd6fe;color:#7c3aed">🎬 Gestionar vídeos</button>
         <button onclick="exportDBBackup()" class="btn btn-secondary" style="white-space:nowrap;font-size:12px" title="Descargar copia de ejercicios personalizados">⬇ Copia DB</button>
         <label class="btn btn-secondary" style="white-space:nowrap;font-size:12px;cursor:pointer;margin:0" title="Restaurar copia de ejercicios">⬆ Restaurar DB<input type="file" accept=".json" onchange="importDBBackup(event)" style="display:none"></label>
         <button onclick="confirmResetDB()" class="btn btn-secondary" style="white-space:nowrap;font-size:12px" title="Restaurar base de datos original">↺ Restaurar</button>
       </div>
     </div>
+    <!-- Video bulk management panel -->
+    <div id="video-bulk-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:700;color:#7c3aed">🎬 Gestión de vídeos de ejercicios</div>
+        <span id="video-count-badge" style="font-size:11px;font-weight:700;background:#ede9fe;color:#7c3aed;padding:2px 9px;border-radius:20px">0 enlazados</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">
+        <strong>Paso 1:</strong> Abre <a href="https://script.google.com" target="_blank" style="color:#7c3aed">script.google.com</a> → Nuevo proyecto → pega el script de abajo → Ejecutar → copia el JSON del log.<br>
+        <strong>Paso 2:</strong> Pega el JSON aquí y pulsa Importar. El sistema busca automáticamente el ejercicio correcto aunque el nombre del fichero tenga guiones, mayúsculas distintas, etc.
+      </div>
+      <details style="margin-bottom:8px">
+        <summary style="font-size:11px;font-weight:700;color:#7c3aed;cursor:pointer">📋 Ver script de Google Apps Script</summary>
+        <pre style="font-size:10px;background:#1e1b4b;color:#a5b4fc;padding:10px;border-radius:8px;overflow-x:auto;margin-top:6px;white-space:pre-wrap">function listarVideos() {
+  var carpeta = DriveApp.getFolderById('1WGJKUl5j7g6UekkRjLbcgr65nTHpJSgL');
+  var archivos = carpeta.getFiles();
+  var resultado = {};
+  while (archivos.hasNext()) {
+    var archivo = archivos.next();
+    var nombre = archivo.getName().replace(/\.[^/.]+$/, ''); // sin extensión
+    nombre = nombre.replace(/[_\-]+/g, ' ').trim();         // guiones → espacios
+    resultado[nombre] = archivo.getId();
+  }
+  Logger.log(JSON.stringify(resultado, null, 2));
+  // Copia el JSON del panel "Registros" (View → Logs)
+}</pre>
+      </details>
+      <textarea id="video-bulk-json" rows="6" placeholder='Pega aquí el JSON generado por el script:\n{\n  "Goblet Squat": "1BxYzAbCdEfGhIjKlMnO",\n  "Romanian Deadlift": "1AbCdEfGhIjKlMnOpQrS",\n  ...\n}' style="width:100%;font-size:11px;font-family:monospace;border:1.5px solid #ddd6fe;border-radius:8px;padding:8px;resize:vertical;box-sizing:border-box;background:#faf5ff"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button onclick="importVideoBulk()" style="padding:6px 14px;background:#7c3aed;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">⬆ Importar</button>
+        <button onclick="exportVideoBulk()" style="padding:6px 14px;background:#fff;color:#7c3aed;border:1.5px solid #ddd6fe;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">⬇ Exportar JSON</button>
+        <button onclick="clearAllVideos()" style="padding:6px 14px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">🗑 Borrar todos</button>
+        <div id="video-bulk-feedback" style="font-size:12px;color:#059669;font-weight:600;align-self:center"></div>
+      </div>
+    </div>
+
     <div class="db-filters" style="margin-bottom:14px">
       <button class="filt-btn active" onclick="filterDBEditor('all',this)">Todos</button>
       <button class="filt-btn" onclick="filterDBEditor('movilidad',this)">🟢 Movilidad</button>
@@ -1158,6 +1219,15 @@ textarea{resize:vertical;min-height:70px}
           <label style="color:#d97706">↓ Regresiones (versiones más fáciles)</label>
           <input id="ex-regressions" type="text" placeholder="separadas por coma">
         </div>
+      </div>
+      <div class="modal-field" style="margin-top:8px">
+        <label style="color:#7c3aed">🎬 Vídeo de demostración (Google Drive)</label>
+        <div class="ex-video-field">
+          <span class="ex-video-field-lbl">URL / ID</span>
+          <input id="ex-video-url" type="text" placeholder="https://drive.google.com/file/d/… o pega el ID directamente">
+          <span id="ex-video-status" class="ex-video-linked" style="display:none">✓ enlazado</span>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">Pega el enlace de Drive (el archivo debe estar compartido como "cualquier persona con el enlace")</div>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #e5e7eb;padding-top:16px;margin-top:4px">
         <button id="ex-delete-btn" onclick="deleteExercise()" style="display:none;padding:8px 16px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">🗑 Eliminar</button>
@@ -7315,7 +7385,7 @@ function renderClassCard(sess, groupSize){
       <div class="cc-st-num" style="background:#fee2e2;color:#b91c1c">${i+1}</div>
       <div style="min-width:0">
         ${e.pattern?`<div class="cc-st-pat">${PATTERN_NAMES[e.pattern]||e.pattern}</div>`:''}
-        <div class="cc-st-main">${exDispName(e.name)}</div>
+        <div class="cc-st-main">${exDispName(e.name)}${getExVideo(e.name)?` <button class="ex-video-btn" onclick="openVideoModal('${(e.name||'').replace(/'/g,"\\'")}')"><svg viewBox="0 0 10 10" style="width:9px;height:9px;fill:currentColor"><polygon points="2,1 9,5 2,9"/></svg></button>`:''}</div>
         <div class="cc-st-detail">${e.circuitReps||''}</div>
       </div>
       <div class="cc-st-scales">
@@ -7831,10 +7901,12 @@ function renderSession(sess){
     const _mobAreaColors={hombro:'#dbeafe',dorsal:'#dcfce7',cadera:'#ffedd5',tobillo:'#fef9c3',global:'#f1f5f9'};
     const _mobAreaText={hombro:'#1d4ed8',dorsal:'#15803d',cadera:'#c2410c',tobillo:'#a16207',global:'#64748b'};
     const mobPill=e._mobArea?`<span style="display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:20px;background:${_mobAreaColors[e._mobArea]||'#f1f5f9'};color:${_mobAreaText[e._mobArea]||'#64748b'};margin-bottom:3px">${_mobAreaLabels[e._mobArea]||''}</span><br>`:"";
+    const _vid=getExVideo(e.name);
+    const _vidBtn=_vid?`<button class="ex-video-btn" onclick="openVideoModal('${(e.name||'').replace(/'/g,"\\'")}')" title="Ver demostración en vídeo"><svg viewBox="0 0 10 10"><polygon points="2,1 9,5 2,9"/></svg> Vídeo</button>`:"";
     return `<div class="ex-item">
       <div class="ex-num">${i+1}</div>
       <div class="ex-content">
-        ${mobPill}${corePill}<div class="ex-name">${exDispName(e.name)}</div>
+        ${mobPill}${corePill}<div class="ex-name">${exDispName(e.name)}${_vidBtn}</div>
         ${detail?`<div class="ex-detail">${detail}</div>`:""}
         ${e.cues?`<div class="ex-cues">${e.cues}</div>`:""}
       </div>
@@ -8096,7 +8168,7 @@ function renderSession(sess){
         <div class="ex-num ph-str" style="background:var(--str-l);color:var(--str);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i+1}</div>
         <div class="ex-content" style="flex:1">
           <span class="pattern-pill">${PATTERN_NAMES[e.pattern]||e.pattern}</span>
-          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}</div>`)}
+          ${_strInEdit?`<input class="edit-input" data-edit-path="fuerza.exercises.${i}.name" value="${(e.name||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-name">${exDispName(e.name)}${getExVideo(e.name)?`<button class="ex-video-btn" onclick="openVideoModal('${(e.name||'').replace(/'/g,"\\'")}')"><svg viewBox="0 0 10 10" style="width:9px;height:9px;fill:currentColor"><polygon points="2,1 9,5 2,9"/></svg> Vídeo</button>`:''}</div>`)}
           ${_strInEdit?`<input class="edit-input edit-detail-input" data-edit-path="fuerza.exercises.${i}.circuitReps" value="${(e.circuitReps||"").replace(/"/g,"&quot;")}">`:(`<div class="ex-detail">${e.circuitReps}</div>`)}
           ${enrichedBadges?`<div style="margin-top:3px">${enrichedBadges}</div>`:""}
           ${progReg}
@@ -8137,7 +8209,7 @@ function renderSession(sess){
       ${_hiitInEdit
         ?`<input class="edit-input" data-edit-path="hiit.exercises.${i}.name" value="${(e.name||"").replace(/"/g,'&quot;')}">
            <input class="edit-input edit-detail-input" data-edit-path="hiit.exercises.${i}.dose" value="${(e.dose||"").replace(/"/g,'&quot;')}" placeholder="Dosis / protocolo">`
-        :`<div class="ex-name">${exDispName(e.name)}</div>${e.dose?`<div class="ex-detail">${e.dose}</div>`:""}`}
+        :`<div class="ex-name">${exDispName(e.name)}${getExVideo(e.name)?`<button class="ex-video-btn" onclick="openVideoModal('${(e.name||'').replace(/'/g,"\\'")}')"><svg viewBox="0 0 10 10" style="width:9px;height:9px;fill:currentColor"><polygon points="2,1 9,5 2,9"/></svg> Vídeo</button>`:''}</div>${e.dose?`<div class="ex-detail">${e.dose}</div>`:""}`}
     </div>
     ${_hiitInEdit?`<button class="ex-remove-btn" onclick="removeExFromBlock('hiit',${i})" title="Eliminar ejercicio">✕</button>`:""}
   </div>`).join("");
@@ -9725,9 +9797,11 @@ function renderDBEditor(filter){
     if(e.progressions&&e.progressions.length) progReg+="<div style='font-size:10px;color:#059669;margin-top:4px'>↑ "+e.progressions.join(", ")+"</div>";
     if(e.regressions&&e.regressions.length) progReg+="<div style='font-size:10px;color:#d97706;'>↓ "+e.regressions.join(", ")+"</div>";
     var color=getCatColor(cat);
+    var hasVid=!!getExVideo(e.name);
     return "<div class='ex-card"+(isCustom?" custom-card":"")+"' onclick='openExModal(\""+escHtml(e.name)+"\",\""+cat+"\")'>"
       +(isCustom?"<span class='ex-badge ex-badge-custom' style='position:absolute;top:10px;right:10px'>⭐ Custom</span>":"")
-      +"<div class='ex-card-cat' style='color:"+color+"'>"+getCatLabel(cat)+"</div>"
+      +(hasVid?"<span style='position:absolute;top:10px;left:10px;font-size:10px;font-weight:700;background:#7c3aed;color:#fff;padding:1px 6px;border-radius:20px'>🎬</span>":"")
+      +"<div class='ex-card-cat' style='color:"+color+";"+(hasVid?"padding-left:36px":"")+"'>"+getCatLabel(cat)+"</div>"
       +"<div class='ex-card-name'>"+escHtml(e.name)+(e.unilateral===true?" <span class='ex-badge' style='background:#fef3c7;color:#92400e;border:1px solid #fde68a;font-size:9px'>unilateral</span>":"")+"</div>"
       +"<div style='margin-bottom:6px'>"
       +"<span class='"+cplxClass+"'>"+cplxLabel+"</span>"
@@ -9781,6 +9855,8 @@ function openExModal(name,cat){
   document.getElementById("ex-progressions").value="";
   document.getElementById("ex-regressions").value="";
   document.getElementById("ex-core-cat").value="isometrico";
+  document.getElementById("ex-video-url").value="";
+  document.getElementById("ex-video-status").style.display="none";
 
   if(!isNew&&name){
     // Find exercise in DB
@@ -9806,11 +9882,198 @@ function openExModal(name,cat){
       document.getElementById("ex-progressions").value=(e.progressions||[]).join(", ");
       document.getElementById("ex-regressions").value=(e.regressions||[]).join(", ");
       if(e.cat) document.getElementById("ex-core-cat").value=e.cat;
+      // Load existing video link
+      var existingVid=getExVideo(name);
+      if(existingVid){
+        document.getElementById("ex-video-url").value='https://drive.google.com/file/d/'+existingVid+'/view';
+        document.getElementById("ex-video-status").style.display="inline";
+      }
     }
   }
   updateExModalFields();
   modal.style.display="flex";
   document.getElementById("ex-name").focus();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VIDEO SYSTEM — Google Drive links per exercise
+// ══════════════════════════════════════════════════════════════════
+
+const _VIDEO_KEY='ex_videos';
+function getExVideos(){try{return JSON.parse(localStorage.getItem(_VIDEO_KEY)||'{}');}catch{return {};}}
+function getExVideo(name){return getExVideos()[name]||null;}
+function setExVideo(name,driveId){
+  const vids=getExVideos();
+  if(driveId&&driveId.trim()){vids[name]=driveId.trim();}
+  else{delete vids[name];}
+  localStorage.setItem(_VIDEO_KEY,JSON.stringify(vids));
+}
+
+// Extracts Drive file ID from a full URL or returns the ID directly
+function parseDriveId(urlOrId){
+  if(!urlOrId)return null;
+  const s=urlOrId.trim();
+  // /d/ID or /d/ID/
+  const m1=s.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
+  if(m1)return m1[1];
+  // ?id=ID
+  const m2=s.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
+  if(m2)return m2[1];
+  // Already a bare ID (no slashes or query chars)
+  if(/^[a-zA-Z0-9_-]{15,}$/.test(s))return s;
+  return null;
+}
+
+function openVideoModal(exName){
+  const id=getExVideo(exName);
+  if(!id){showToast('Sin vídeo enlazado para este ejercicio');return;}
+  document.getElementById('video-modal-name').textContent=exName;
+  document.getElementById('video-modal-iframe').src='https://drive.google.com/file/d/'+id+'/preview';
+  const driveLink=document.getElementById('video-modal-drive-link');
+  if(driveLink){driveLink.href='https://drive.google.com/file/d/'+id+'/view';}
+  document.getElementById('video-modal-overlay').classList.add('open');
+}
+function closeVideoModal(){
+  document.getElementById('video-modal-overlay').classList.remove('open');
+  // Stop video by clearing src
+  setTimeout(function(){
+    const f=document.getElementById('video-modal-iframe');
+    if(f)f.src='';
+  },300);
+}
+
+function toggleVideoBulkPanel(){
+  const p=document.getElementById('video-bulk-panel');
+  if(!p)return;
+  p.classList.toggle('open');
+  if(p.classList.contains('open'))updateVideoBulkCount();
+}
+
+function updateVideoBulkCount(){
+  const vids=getExVideos();
+  const count=Object.keys(vids).length;
+  const badge=document.getElementById('video-count-badge');
+  if(badge)badge.textContent=count+' enlazado'+(count!==1?'s':'');
+}
+
+// Normalise a name for fuzzy matching: lowercase, strip accents, replace non-alphanumeric with space, collapse spaces
+function _normName(s){
+  return (s||'').toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')  // strip accents
+    .replace(/[^a-z0-9]+/g,' ')                        // non-alphanumeric → space
+    .trim();
+}
+
+// Build a lookup table: normalised name → exact DB exercise name
+function _buildExNameLookup(){
+  const map={};
+  getAllDBEntries().forEach(function({ex}){
+    map[_normName(ex.name)]=ex.name;
+  });
+  return map;
+}
+
+function importVideoBulk(){
+  const raw=document.getElementById('video-bulk-json').value.trim();
+  if(!raw){showToast('El campo JSON está vacío');return;}
+  let obj;
+  try{obj=JSON.parse(raw);}
+  catch(e){document.getElementById('video-bulk-feedback').textContent='❌ JSON inválido: '+e.message;return;}
+
+  const vids=getExVideos();
+  const lookup=_buildExNameLookup();
+  let added=0,fuzzy=0,badId=0;
+  const unmatched=[];  // {filename, id}
+
+  for(const[rawName,val] of Object.entries(obj)){
+    const id=parseDriveId(String(val));
+    if(!id){badId++;continue;}
+
+    // 1. Exact normalised match
+    if(lookup[_normName(rawName)]){
+      vids[lookup[_normName(rawName)]]=id;
+      added++;continue;
+    }
+
+    // 2. Progressive prefix (drop last word each time)
+    const normRaw=_normName(rawName);
+    let matched=null;
+    const parts=normRaw.split(' ');
+    for(let len=parts.length;len>=2;len--){
+      const candidate=parts.slice(0,len).join(' ');
+      if(lookup[candidate]){matched=lookup[candidate];break;}
+    }
+    if(matched){vids[matched]=id;fuzzy++;continue;}
+
+    // 3. All filename words appear in DB name
+    const rawWords=normRaw.split(' ').filter(w=>w.length>2);
+    for(const[norm,exact] of Object.entries(lookup)){
+      if(rawWords.every(w=>norm.includes(w))){matched=exact;break;}
+    }
+    if(matched){vids[matched]=id;fuzzy++;continue;}
+
+    // 4. No match — store with original key, track for display
+    vids[rawName]=id;
+    unmatched.push({filename:rawName,id});
+  }
+
+  localStorage.setItem(_VIDEO_KEY,JSON.stringify(vids));
+  updateVideoBulkCount();
+
+  const fb=document.getElementById('video-bulk-feedback');
+  let html='<span style="color:#059669;font-weight:700">✓ '+(added+fuzzy)+' enlazados</span>';
+  if(fuzzy) html+=' <span style="color:#6b7280">('+fuzzy+' por coincidencia aproximada)</span>';
+  if(badId) html+=' · <span style="color:#dc2626">'+badId+' IDs inválidos</span>';
+
+  if(unmatched.length){
+    html+='<br><span style="color:#d97706;font-weight:700">⚠ '+unmatched.length+' sin coincidencia en DB:</span>';
+    html+='<div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">';
+    unmatched.forEach(function(u){
+      html+='<div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #fde68a;border-radius:6px;padding:5px 8px">'
+        +'<span style="font-size:11px;font-family:monospace;color:#92400e;flex:1">'+escHtml(u.filename)+'</span>'
+        +'<button onclick="openVideoModal(\''+escHtml(u.filename).replace(/'/g,"\\'")+'\')" style="padding:2px 8px;background:#7c3aed;color:#fff;border:none;border-radius:12px;font-size:10px;cursor:pointer">▶ Ver</button>'
+        +'<button onclick="fixUnmatchedVideo(\''+escHtml(u.filename).replace(/'/g,"\\'")+'\',\''+u.id+'\')" style="padding:2px 8px;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:12px;font-size:10px;cursor:pointer">✏ Asignar</button>'
+        +'</div>';
+    });
+    html+='</div>';
+  }
+
+  fb.innerHTML=html;
+  renderDBEditor(window._dbFilter||'all');
+}
+
+// Opens a small prompt to manually assign a filename's video to the correct exercise name
+function fixUnmatchedVideo(filename,id){
+  const correctName=prompt(
+    'El vídeo "'+filename+'" no coincidió con ningún ejercicio.\n\nEscribe el nombre EXACTO del ejercicio al que asignarlo\n(tal como aparece en la base de datos):',
+    filename
+  );
+  if(!correctName||!correctName.trim())return;
+  const vids=getExVideos();
+  // Remove old key, add correct one
+  delete vids[filename];
+  vids[correctName.trim()]=id;
+  localStorage.setItem(_VIDEO_KEY,JSON.stringify(vids));
+  updateVideoBulkCount();
+  showToast('✅ Vídeo asignado a: '+correctName.trim());
+  renderDBEditor(window._dbFilter||'all');
+}
+
+function exportVideoBulk(){
+  const vids=getExVideos();
+  const blob=new Blob([JSON.stringify(vids,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='exercise_videos_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+function clearAllVideos(){
+  if(!confirm('¿Eliminar todos los enlaces de vídeo? Esta acción no se puede deshacer.'))return;
+  localStorage.removeItem(_VIDEO_KEY);
+  updateVideoBulkCount();
+  document.getElementById('video-bulk-feedback').textContent='Todos los vídeos eliminados.';
+  renderDBEditor(window._dbFilter||'all');
 }
 
 function closeExModal(){
@@ -9916,9 +10179,17 @@ function saveExercise(){
   }
 
   localStorage.setItem(DB_CUSTOM_KEY,JSON.stringify(custom));
+
+  // Save video link if provided
+  var videoRaw=document.getElementById("ex-video-url").value.trim();
+  var videoId=parseDriveId(videoRaw);
+  var origName2=document.getElementById("ex-original-name").value;
+  if(origName2&&origName2!==name) setExVideo(origName2,null); // remove old name mapping
+  setExVideo(name, videoId||null);
+
   closeExModal();
   renderDBEditor();
-  showToast("✅ Ejercicio guardado: "+name);
+  showToast("✅ Ejercicio guardado: "+name+(videoId?" 🎬":""));
 }
 
 function deleteExercise(){
@@ -14875,6 +15146,24 @@ function _closeProtoFormModal(evt){
   <button class="regen-item" onclick="regenSection('fuerza')">🔴 <span>Solo Bloque de Fuerza</span></button>
   <button class="regen-item" onclick="regenSection('hiit')">🟣 <span>Solo HIIT</span></button>
   <button class="regen-item" onclick="regenSection('cooldown')">🟢 <span>Solo Vuelta a la Calma</span></button>
+</div>
+
+<!-- ══ VIDEO MODAL ════════════════════════════════════════════════ -->
+<div id="video-modal-overlay" onclick="if(event.target===this)closeVideoModal()">
+  <div id="video-modal-box">
+    <div id="video-modal-hdr">
+      <span style="font-size:16px">▶</span>
+      <span id="video-modal-name">–</span>
+      <button id="video-modal-close" onclick="closeVideoModal()">✕</button>
+    </div>
+    <div id="video-modal-ratio">
+      <iframe id="video-modal-iframe" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+    <div id="video-modal-ftr">
+      <span style="font-size:11px;color:rgba(255,255,255,.4)">Los vídeos deben estar compartidos en Drive como "cualquier persona con el enlace"</span>
+      <a id="video-modal-drive-link" href="#" target="_blank">Abrir en Drive ↗</a>
+    </div>
+  </div>
 </div>
 
 </body>
