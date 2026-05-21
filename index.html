@@ -379,6 +379,50 @@ textarea{resize:vertical;min-height:70px}
 .pt-client-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:600px){.pt-client-grid{grid-template-columns:1fr}}
 .pt-section-hdr{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin:14px 0 7px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+/* PT CLIENT DB */
+.pt-topbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.pt-nav-btn{padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.pt-nav-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pt-nav-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.pt-field-label{font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px}
+.pt-field-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);box-sizing:border-box}
+.pt-field-input:focus{outline:none;border-color:var(--primary)}
+.pt-equip-sub{margin-bottom:10px}
+.pt-equip-sub-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+/* Client cards grid */
+.pt-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.pt-client-card{border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--surface);transition:box-shadow .15s}
+.pt-client-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.pt-client-card-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px}
+.pt-client-card-meta{font-size:11px;color:var(--text3);margin-bottom:8px}
+.pt-client-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;min-height:20px}
+.pt-client-card-tag{padding:2px 8px;border-radius:8px;background:#fee2e2;color:#b91c1c;font-size:10px;font-weight:700}
+.pt-client-card-actions{display:flex;gap:6px}
+.pt-client-card-actions .btn{padding:5px 10px;font-size:11px}
+/* Sessions list in ficha */
+.pt-sess-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--surface)}
+.pt-sess-item-date{font-size:11px;color:var(--text3);flex:1}
+.pt-sess-item-btns{display:flex;gap:5px}
+/* Multi view */
+.pt-multi-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.pt-multi-grid{grid-template-columns:1fr}}
+.pt-multi-card{border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--surface);font-size:12px}
+.pt-multi-card-hdr{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px}
+.pt-multi-card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
+.pt-multi-card-tag{padding:1px 6px;border-radius:6px;background:#fee2e2;color:#b91c1c;font-size:10px;font-weight:700}
+.pt-multi-block{border-top:1px solid var(--border);padding-top:6px;margin-top:6px}
+.pt-multi-block-hdr{font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.pt-multi-block ol,.pt-multi-block ul{margin:0;padding-left:16px}
+.pt-multi-block li{margin-bottom:2px;color:var(--text);line-height:1.4}
+/* Print styles for multi view */
+@media print{
+  body *{visibility:hidden}
+  #pt-multi-grid,#pt-multi-grid *{visibility:visible}
+  #pt-multi-grid{position:fixed;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;font-size:9px}
+  .pt-multi-card{break-inside:avoid;border:1px solid #ccc;padding:8px;border-radius:6px}
+  .pt-multi-card-hdr{font-size:11px}
+  button,.btn,.pt-topbar,.pt-multi-grid button{display:none!important}
+}
 .pt-condition-card{border-radius:10px;border:1.5px solid var(--border);padding:12px 14px;margin-bottom:10px}
 .pt-condition-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .pt-condition-icon{font-size:18px;flex-shrink:0}
@@ -1641,79 +1685,265 @@ textarea{resize:vertical;min-height:70px}
 </section>
 
 <section id="tab-pt" class="tab-panel">
-  <div class="card">
-    <div class="card-title">👤 Entrenamiento Personal Individual</div>
-    <div class="pt-section-hdr">Datos del cliente</div>
-    <div class="pt-client-grid">
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Nombre</label>
-        <input id="pt-name" type="text" placeholder="Nombre del cliente" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);box-sizing:border-box">
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Edad</label>
-        <input id="pt-age" type="number" min="10" max="90" placeholder="Años" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);box-sizing:border-box">
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Sexo biológico</label>
-        <select id="pt-sex" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);box-sizing:border-box">
-          <option value="">-- Seleccionar --</option>
-          <option value="M">Masculino</option>
-          <option value="F">Femenino</option>
-          <option value="X">Prefiero no indicar</option>
-        </select>
-      </div>
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Nivel</label>
-        <select id="pt-level" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);box-sizing:border-box">
-          <option value="beginner">Principiante</option>
-          <option value="intermediate" selected="">Intermedio</option>
-          <option value="advanced">Avanzado</option>
-        </select>
-      </div>
+
+  <!-- ── Top nav bar ── -->
+  <div class="pt-topbar">
+    <button class="pt-nav-btn" id="pt-nav-list" onclick="ptShowView('list')">👥 Clientes</button>
+    <button class="pt-nav-btn" id="pt-nav-multi" onclick="ptShowView('multi')">📋 Vista 4 clientes</button>
+    <button class="pt-nav-btn active" id="pt-nav-analyze" onclick="ptShowView('analyze')">🧠 Análisis PT</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       VISTA 1: Lista de clientes
+  ════════════════════════════════════════════════ -->
+  <div id="pt-view-list" style="display: none;">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+      <input id="pt-search" type="text" placeholder="🔍 Buscar cliente..." oninput="ptRenderList()" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">
+      <button class="btn btn-primary" onclick="ptNewClient()" style="white-space:nowrap;padding:8px 14px">➕ Nuevo cliente</button>
     </div>
-    <div class="pt-section-hdr">Material disponible</div>
-    <div class="chip-group" id="pt-eq-chips">
-      <label class="chip"><input type="checkbox" value="dumbbell">Mancuernas</label>
-      <label class="chip"><input type="checkbox" value="barbell">Barra</label>
-      <label class="chip"><input type="checkbox" value="kettlebell">Kettlebell</label>
-      <label class="chip"><input type="checkbox" value="band">Bandas</label>
-      <label class="chip"><input type="checkbox" value="machine">Máquinas</label>
-      <label class="chip"><input type="checkbox" value="box">Cajón/Step</label>
-      <label class="chip"><input type="checkbox" value="foam_roller">Foam Roller</label>
-      <label class="chip"><input type="checkbox" value="trx">TRX</label>
+    <div id="pt-clients-grid"><div style="text-align:center;padding:40px 20px;color:var(--text3)">No hay clientes aún.<br><button class="btn btn-primary" onclick="ptNewClient()" style="margin-top:14px;padding:9px 20px">➕ Crear primer cliente</button></div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       VISTA 2: Ficha de cliente
+  ════════════════════════════════════════════════ -->
+  <div id="pt-view-ficha" style="display: none;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button class="btn" onclick="ptShowView('list')" style="padding:7px 12px;font-size:13px">← Clientes</button>
+      <span id="pt-ficha-title" style="font-size:16px;font-weight:800;color:var(--text);flex:1">Nuevo cliente</span>
     </div>
-    <div class="pt-section-hdr">Historial clínico y objetivo</div>
-    <textarea id="pt-intake" class="pt-intake" rows="7" placeholder="Describe con libertad la situación del cliente: lesiones previas o actuales, objetivos, historial médico relevante, limitaciones, nivel de actividad previo, motivaciones...
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:10px">Datos del cliente</div>
+      <div class="pt-client-grid">
+        <div>
+          <label class="pt-field-label">Nombre</label>
+          <input id="pt-name" type="text" placeholder="Nombre del cliente" class="pt-field-input">
+        </div>
+        <div>
+          <label class="pt-field-label">Edad</label>
+          <input id="pt-age" type="number" min="10" max="90" placeholder="Años" class="pt-field-input">
+        </div>
+        <div>
+          <label class="pt-field-label">Sexo biológico</label>
+          <select id="pt-sex" class="pt-field-input">
+            <option value="">-- Seleccionar --</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="X">Prefiero no indicar</option>
+          </select>
+        </div>
+        <div>
+          <label class="pt-field-label">Nivel</label>
+          <select id="pt-level" class="pt-field-input">
+            <option value="beginner">Principiante</option>
+            <option value="intermediate" selected="">Intermedio</option>
+            <option value="advanced">Avanzado</option>
+          </select>
+        </div>
+        <div>
+          <label class="pt-field-label">Sesiones / semana</label>
+          <select id="pt-freq" class="pt-field-input" style="width:auto">
+            <option value="2">2 días</option>
+            <option value="3" selected="">3 días</option>
+            <option value="4">4 días</option>
+          </select>
+        </div>
+        <div>
+          <label class="pt-field-label">Duración del plan</label>
+          <select id="pt-duration" class="pt-field-input" style="width:auto">
+            <option value="4">4 semanas</option>
+            <option value="8" selected="">8 semanas</option>
+            <option value="12">12 semanas</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pt-section-hdr">Restricciones / Patologías</div>
+      <div id="pt-rest-chips" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px">
+        <button class="restriction-chip" data-keyword="rodilla" onclick="_ptToggleRestr(this)">🦵 Rodilla</button>
+        <button class="restriction-chip" data-keyword="hombro" onclick="_ptToggleRestr(this)">💪 Hombro</button>
+        <button class="restriction-chip" data-keyword="lumbar" onclick="_ptToggleRestr(this)">🔙 Lumbar</button>
+        <button class="restriction-chip" data-keyword="tobillo" onclick="_ptToggleRestr(this)">🦶 Tobillo</button>
+        <button class="restriction-chip" data-keyword="embarazo" onclick="_ptToggleRestr(this)">🤰 Embarazo</button>
+        <button class="restriction-chip" data-keyword="cuello" onclick="_ptToggleRestr(this)">🫀 Cuello/Cervical</button>
+        <button class="restriction-chip" data-keyword="sin impacto" onclick="_ptToggleRestr(this)">⬇️ Sin impacto</button>
+        <button class="restriction-chip" data-keyword="cardio suave" onclick="_ptToggleRestr(this)">❤️ Cardio suave</button>
+      </div>
+
+      <div class="pt-section-hdr">Material disponible</div>
+      <div id="pt-eq-chips" style="margin-bottom:12px">
+        <div class="pt-equip-sub">
+          <div class="pt-equip-sub-label">Peso libre</div>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" value="barbell">🏋️ Barra</label>
+            <label class="chip"><input type="checkbox" value="dumbbell">💪 Mancuernas</label>
+            <label class="chip"><input type="checkbox" value="kettlebell">🔔 Kettlebell</label>
+            <label class="chip"><input type="checkbox" value="medicine_ball">⚽ Balón med.</label>
+            <label class="chip"><input type="checkbox" value="sandbag">🎒 Sandbag</label>
+          </div>
+        </div>
+        <div class="pt-equip-sub">
+          <div class="pt-equip-sub-label">Máquinas · Cardio · Combate</div>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" value="cable">🔗 Poleas</label>
+            <label class="chip"><input type="checkbox" value="reformer">🛏️ Reformer</label>
+            <label class="chip"><input type="checkbox" value="cardio_machine">🚴 Cardio</label>
+            <label class="chip"><input type="checkbox" value="battle_ropes">〰️ Battle ropes</label>
+            <label class="chip"><input type="checkbox" value="saco">🥊 Saco</label>
+            <label class="chip"><input type="checkbox" value="pads">🤜 Paos</label>
+            <label class="chip"><input type="checkbox" value="jump_rope">🪢 Comba</label>
+            <label class="chip"><input type="checkbox" value="sled">🛷 Trineo</label>
+          </div>
+        </div>
+        <div class="pt-equip-sub">
+          <div class="pt-equip-sub-label">Mobiliario · Anclajes</div>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" value="bench">🪑 Banco</label>
+            <label class="chip"><input type="checkbox" value="box">📦 Cajón/Step</label>
+            <label class="chip"><input type="checkbox" value="pullup_bar">🔝 Dominadas</label>
+            <label class="chip"><input type="checkbox" value="trx">⛓️ TRX</label>
+          </div>
+        </div>
+        <div class="pt-equip-sub">
+          <div class="pt-equip-sub-label">Accesorios · Inestabilidad</div>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" value="band">🔴 Bandas</label>
+            <label class="chip"><input type="checkbox" value="foam_roller">🪵 Foam roller</label>
+            <label class="chip"><input type="checkbox" value="bosu">🔵 BOSU</label>
+            <label class="chip"><input type="checkbox" value="fitball">🟡 Fitball</label>
+            <label class="chip"><input type="checkbox" value="ab_wheel">⚙️ Rueda abd.</label>
+            <label class="chip"><input type="checkbox" value="slider">🟦 Sliders</label>
+            <label class="chip"><input type="checkbox" value="ladder">🪜 Escalera</label>
+            <label class="chip"><input type="checkbox" value="cone">🔺 Conos</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-section-hdr">Historial clínico y objetivo</div>
+      <textarea id="pt-intake" class="pt-intake" rows="5" placeholder="Lesiones previas, objetivos, historial médico, motivaciones..."></textarea>
+
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="ptSaveFicha(window._ptCurrentClientId)" style="flex:1;padding:11px;font-size:14px">💾 Guardar ficha</button>
+        <button class="btn" onclick="ptGenerateForClient(window._ptCurrentClientId)" style="flex:1;padding:11px;font-size:14px;background:#ede9fe;color:#6b21a8;border-color:#c4b5fd">⚡ Generar nueva sesión</button>
+        <button class="btn" id="pt-analyze-btn" onclick="analyzePTClient()" style="flex:1;padding:11px;font-size:14px">🧠 Análisis PT completo</button>
+      </div>
+      <div id="pt-ai-indicator" style="display: block; margin-top: 8px; text-align: center; font-size: 11px; color: rgb(124, 58, 237); font-weight: 600;">✨ IA activa — análisis inteligente activado</div>
+      <div id="pt-ai-loading" class="ai-loading" style="display:none"><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span> Analizando con IA...</div>
+    </div>
+
+    <!-- Sesión generada temporalmente -->
+    <div id="pt-gen-preview" style="display:none;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;color:var(--text)">⚡ Sesión generada (sin guardar)</span>
+        <button class="btn btn-primary" onclick="ptSaveSessionToClient(window._ptCurrentClientId)" style="padding:6px 14px;font-size:12px">💾 Guardar en ficha</button>
+        <button class="btn" onclick="document.getElementById('pt-gen-preview').style.display='none'" style="padding:6px 10px;font-size:12px">✕</button>
+      </div>
+      <div id="pt-gen-preview-content"></div>
+    </div>
+
+    <!-- Sesiones guardadas -->
+    <div class="card" id="pt-sessions-card">
+      <div class="card-title" style="margin-bottom:10px">Sesiones guardadas</div>
+      <div id="pt-sessions-list"><div style="font-size:12px;color:var(--text3);padding:8px 0">No hay sesiones guardadas aún.</div></div>
+    </div>
+
+    <div id="pt-output"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       VISTA 3: Multi 4 clientes
+  ════════════════════════════════════════════════ -->
+  <div id="pt-view-multi" style="display: none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <span style="font-size:15px;font-weight:800;color:var(--text)">📋 Vista multi — 4 clientes</span>
+      <button class="btn btn-primary" onclick="ptPrintMulti()" style="padding:8px 16px">🖨 Imprimir — 4 clientes en 1 folio</button>
+    </div>
+    <div id="pt-multi-selectors" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px"><div><label class="pt-field-label">Slot 1</label><select onchange="ptMultiSelectClient(0,this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);margin-bottom:5px"><option value="">— Sin cliente —</option><option value="1779394243329">Sin nombre</option></select></div><div><label class="pt-field-label">Slot 2</label><select onchange="ptMultiSelectClient(1,this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);margin-bottom:5px"><option value="">— Sin cliente —</option><option value="1779394243329">Sin nombre</option></select></div><div><label class="pt-field-label">Slot 3</label><select onchange="ptMultiSelectClient(2,this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);margin-bottom:5px"><option value="">— Sin cliente —</option><option value="1779394243329">Sin nombre</option></select></div><div><label class="pt-field-label">Slot 4</label><select onchange="ptMultiSelectClient(3,this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);margin-bottom:5px"><option value="">— Sin cliente —</option><option value="1779394243329">Sin nombre</option></select></div></div>
+    <div id="pt-multi-grid" class="pt-multi-grid"><div class="pt-multi-card" style="color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;min-height:160px">Slot 1 vacío</div><div class="pt-multi-card" style="color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;min-height:160px">Slot 2 vacío</div><div class="pt-multi-card" style="color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;min-height:160px">Slot 3 vacío</div><div class="pt-multi-card" style="color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;min-height:160px">Slot 4 vacío</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       VISTA 4: Análisis PT clásico (se mantiene como estaba)
+  ════════════════════════════════════════════════ -->
+  <div id="pt-view-analyze" style="">
+    <div class="card">
+      <div class="card-title">🧠 Análisis PT Individual</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px">Análisis clínico completo. Para sesiones individuales rápidas usa la ficha de cliente.</p>
+      <div class="pt-section-hdr">Datos del cliente</div>
+      <div class="pt-client-grid">
+        <div>
+          <label class="pt-field-label">Nombre</label>
+          <input id="pt-name-a" type="text" placeholder="Nombre del cliente" class="pt-field-input">
+        </div>
+        <div>
+          <label class="pt-field-label">Edad</label>
+          <input id="pt-age-a" type="number" min="10" max="90" placeholder="Años" class="pt-field-input">
+        </div>
+        <div>
+          <label class="pt-field-label">Sexo biológico</label>
+          <select id="pt-sex-a" class="pt-field-input">
+            <option value="">-- Seleccionar --</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+            <option value="X">Prefiero no indicar</option>
+          </select>
+        </div>
+        <div>
+          <label class="pt-field-label">Nivel</label>
+          <select id="pt-level-a" class="pt-field-input">
+            <option value="beginner">Principiante</option>
+            <option value="intermediate" selected="">Intermedio</option>
+            <option value="advanced">Avanzado</option>
+          </select>
+        </div>
+      </div>
+      <div class="pt-section-hdr">Material disponible</div>
+      <div class="chip-group" id="pt-eq-chips-a">
+        <label class="chip"><input type="checkbox" value="dumbbell">Mancuernas</label>
+        <label class="chip"><input type="checkbox" value="barbell">Barra</label>
+        <label class="chip"><input type="checkbox" value="kettlebell">Kettlebell</label>
+        <label class="chip"><input type="checkbox" value="band">Bandas</label>
+        <label class="chip"><input type="checkbox" value="cable">Máquinas/Cable</label>
+        <label class="chip"><input type="checkbox" value="box">Cajón/Step</label>
+        <label class="chip"><input type="checkbox" value="foam_roller">Foam Roller</label>
+        <label class="chip"><input type="checkbox" value="trx">TRX</label>
+        <label class="chip"><input type="checkbox" value="bench">Banco</label>
+        <label class="chip"><input type="checkbox" value="pullup_bar">Dominadas</label>
+      </div>
+      <div class="pt-section-hdr">Historial clínico y objetivo</div>
+      <textarea id="pt-intake-a" class="pt-intake" rows="7" placeholder="Describe con libertad la situación del cliente: lesiones previas o actuales, objetivos, historial médico relevante, limitaciones, nivel de actividad previo, motivaciones...
 
 Ejemplos:
 • 'Dolor lumbar crónico L4-L5, protrusión discal, objetiva mejorar la movilidad y volver a correr'
 • 'Postparto 4 meses, diástasis abdominal, recuperar tono del core y perder 8 kg'
 • 'Tendinitis rotuliana rodilla izquierda, corredor amateur, quiere hacer el maratón de Madrid'
 • 'Sedentario total, hipertensión leve, 58 años, objetivo general de salud y perder peso'"></textarea>
-    <div class="pt-section-hdr" style="margin-top:14px">Planificación</div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Sesiones / semana</label>
-        <select id="pt-freq" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">
-          <option value="2">2 días</option>
-          <option value="3" selected="">3 días</option>
-          <option value="4">4 días</option>
-        </select>
+      <div class="pt-section-hdr" style="margin-top:14px">Planificación</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <label class="pt-field-label">Sesiones / semana</label>
+          <select id="pt-freq-a" class="pt-field-input" style="width:auto">
+            <option value="2">2 días</option>
+            <option value="3" selected="">3 días</option>
+            <option value="4">4 días</option>
+          </select>
+        </div>
+        <div>
+          <label class="pt-field-label">Duración del plan</label>
+          <select id="pt-duration-a" class="pt-field-input" style="width:auto">
+            <option value="4">4 semanas</option>
+            <option value="8" selected="">8 semanas</option>
+            <option value="12">12 semanas</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:4px">Duración del plan</label>
-        <select id="pt-duration" style="border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text)">
-          <option value="4">4 semanas</option>
-          <option value="8" selected="">8 semanas</option>
-          <option value="12">12 semanas</option>
-        </select>
-      </div>
+      <button class="btn btn-primary" id="pt-analyze-btn-a" onclick="analyzePTClient()" style="width:100%;padding:13px;font-size:14px">🧠 Analizar y Generar Plan PT</button>
+      <div id="pt-ai-indicator-a" style="display: block; margin-top: 8px; text-align: center; font-size: 11px; color: rgb(124, 58, 237); font-weight: 600;">✨ IA activa — análisis inteligente activado</div>
+      <div id="pt-ai-loading-a" class="ai-loading" style="display:none"><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span> Analizando con IA...</div>
     </div>
-    <button class="btn btn-primary" id="pt-analyze-btn" onclick="analyzePTClient()" style="width:100%;padding:13px;font-size:14px">🧠 Analizar y Generar Plan PT</button>
-    <div id="pt-ai-indicator" style="display: block; margin-top: 8px; text-align: center; font-size: 11px; color: rgb(124, 58, 237); font-weight: 600;">✨ IA activa — análisis inteligente activado</div>
-    <div id="pt-ai-loading" class="ai-loading" style="display:none"><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span><span class="ai-dot-anim"></span> Analizando con IA...</div>
+    <div id="pt-output-a"></div>
   </div>
-  <div id="pt-output"></div>
+
 </section>
 
 <!-- TAB: DOCUMENTOS -->
@@ -7782,6 +8012,185 @@ const PATTERN_NAMES={
 const FOCUS_NAMES={full_body:"Cuerpo Completo",upper:"Tren Superior",lower:"Tren Inferior"};
 const LEVEL_NAMES={beginner:"Principiante",intermediate:"Intermedio",advanced:"Avanzado"};
 
+// ── EVIDENCIA CLÍNICA POR CONDICIÓN ────────────────────────────────────────
+const CLINICAL_NOTES={
+  rodilla:{
+    icon:"🦵",label:"Patología de Rodilla",color:"#0284c7",bg:"#e0f2fe",border:"#0284c7",
+    priorizar:[
+      "Cadena cinética cerrada: prensa, step-up, sentadilla parcial (0-60°)",
+      "Fortalecer VMO (cuádriceps), glúteo medio y estabilizadores de cadera",
+      "Excéntrico controlado si hay tendinopatía rotuliana (protocolo Alfredson)",
+      "Isométricos sin dolor como punto de partida (reducen dolor inmediato)",
+      "Propriocepción y equilibrio monopodal en superficie estable primero"
+    ],
+    evitar:[
+      "Hiperflexión >90° bajo carga hasta valoración funcional",
+      "Saltos, impacto y cambios de dirección bruscos",
+      "Sentadilla profunda y lunges con dolor activo",
+      "Leg extension con carga libre si hay condromalacia rotuliana"
+    ],
+    nota:"ACSM 2022 · Br J Sports Med (2019) — Programa de Fuerza en Patología de Rodilla"
+  },
+  hombro:{
+    icon:"💪",label:"Patología de Hombro",color:"#7c3aed",bg:"#ede9fe",border:"#7c3aed",
+    priorizar:[
+      "Ratio tracción:empuje ≥ 1:1 (tracción siempre igual o mayor que empuje)",
+      "Fortalecer manguito rotador: rotación externa, RE con banda, Face Pull",
+      "Activación escapular (retracción + depresión) como base de cualquier press",
+      "Y-T-W en prone para fuerza del trapecio inferior y serrato anterior",
+      "Rango libre de dolor: no forzar amplitud si hay pinzamiento subacromial"
+    ],
+    evitar:[
+      "Press detrás de cuello y elevaciones laterales por encima de 90°",
+      "Tracción vertical (dominadas, jalón) en inestabilidad glenohumeral activa",
+      "Carga excesiva en flexión de codo con bíceps si hay tendinopatía bicipital",
+      "Priorizar empuje horizontal o neutro antes que overhead"
+    ],
+    nota:"JOSPT 2021 · Kibler et al. (2013) — Estabilidad Escapular y Función del Hombro"
+  },
+  lumbar:{
+    icon:"🔙",label:"Dolor / Patología Lumbar",color:"#b45309",bg:"#fef3c7",border:"#b45309",
+    priorizar:[
+      "McGill Big 3: Bird-Dog, Curl-Up de McGill, Plancha Lateral",
+      "Bisagra de cadera con columna neutra (RDL, Good Morning con control)",
+      "Fortalecer glúteos e isquiotibiales para aliviar carga lumbar directa",
+      "Activación del músculo transverso abdominal (breathing + bracing)",
+      "Progresar carga solo con columna neutral mantenida en todo el rango"
+    ],
+    evitar:[
+      "Flexión lumbar bajo carga (crunch, sit-up, good morning sin control)",
+      "Flexión + rotación combinada bajo carga (madera con rotación, balanceos)",
+      "Hiperlordosis lumbar en press de banca o military press",
+      "Valsalva en presencia de hernia discal confirmada"
+    ],
+    nota:"McGill SM (2016) Back Mechanic · NICE Guidelines (2023) — Low Back Pain"
+  },
+  tobillo:{
+    icon:"🦶",label:"Patología de Tobillo",color:"#059669",bg:"#dcfce7",border:"#059669",
+    priorizar:[
+      "Propiocepción y equilibrio monopodal: suelo firme → inestable → dinámico",
+      "Fortalecer peroneos, tibial anterior y flexores plantares",
+      "Excéntrico de gemelo y sóleo (protocolo Alfredson en tendinopatía Aquiles)",
+      "Movilidad activa de tobillo: dorsiflexión con rodilla en valgo controlado",
+      "Sentadilla con talones elevados si hay limitación de dorsiflexión"
+    ],
+    evitar:[
+      "Saltos y pliometría hasta resolución de inestabilidad ligamentosa",
+      "Cargas en dorsiflexión máxima si hay espolón calcáneo o fascitis",
+      "Cambios de dirección sin estabilidad activa confirmada",
+      "Superficies inestables antes de tener control estático seguro"
+    ],
+    nota:"JOSPT 2021 · Bleakley et al. (2010) — Ejercicio en Lesiones de Tobillo"
+  },
+  embarazo:{
+    icon:"🤰",label:"Embarazo",color:"#db2777",bg:"#fce7f3",border:"#db2777",
+    priorizar:[
+      "Ejercicio aeróbico moderado (60-80% FC máx) es seguro y recomendado (ACOG 2020)",
+      "Usar escala de Borg 12-14/20 (esfuerzo percibido) en lugar de % FC máx",
+      "Fortalecer suelo pélvico: Kegel progresivos y funcionales",
+      "Movilidad: rotación torácica, cadenas posteriores, cadera",
+      "Posición lateral izquierda o semi-incorporada como alternativa al supino"
+    ],
+    evitar:[
+      "Decúbito supino >20 semanas (compresión de vena cava inferior)",
+      "Maniobra de Valsalva y apneas bajo carga",
+      "Impacto de alta intensidad, contacto físico y deportes de riesgo de caída",
+      "Hipopresivos en 1er trimestre y si hay amenaza de parto prematuro",
+      "Diastasis abdominal: evitar ejercicios que aumenten presión intraabdominal sin control"
+    ],
+    nota:"ACOG Committee Opinion 804 (2020) · SOGC/CSEP (2019) — Guidelines for Physical Activity in Pregnancy"
+  },
+  cuello:{
+    icon:"🫀",label:"Patología Cervical / Cuello",color:"#dc2626",bg:"#fee2e2",border:"#dc2626",
+    priorizar:[
+      "Fortalecer flexores cervicales profundos (longus colli / longus capitis)",
+      "Estiramiento de trapecio superior, elevador de la escápula y ECOM",
+      "Corrección postural: retracción cervical activa (chin tuck) como ejercicio base",
+      "Fortalecer trapecio inferior y serrato anterior para aliviar carga cervical",
+      "Movilidad torácica activa: reducir hipercifosis torácica compensa la cervical"
+    ],
+    evitar:[
+      "Extensión cervical forzada bajo carga (press detrás de cuello, shrugs con cabeza adelantada)",
+      "Tracción vertical con carga cervical si hay hernia o protrusión discal",
+      "Ejercicios que aumenten presión intradiscal: flexión cervical con resistencia",
+      "Impacto en cabeza y cuello si hay inestabilidad articular confirmada"
+    ],
+    nota:"JOSPT 2017 · Jull et al. (2008) — Whiplash, Headache and Neck Pain"
+  },
+  "sin impacto":{
+    icon:"⬇️",label:"Sin Impacto",color:"#0284c7",bg:"#f0f9ff",border:"#0284c7",
+    priorizar:[
+      "Cardio de bajo impacto: bicicleta estática, remo, natación, elíptica",
+      "Fuerza en cadena cinética cerrada sin salto ni impacto",
+      "Trabajo de movilidad, estiramiento activo y control neuromuscular",
+      "HIIT adaptado: trabajo de empuje-tirón, cuadrupedia, planchas dinámicas"
+    ],
+    evitar:[
+      "Saltos, pliometría, carreras y ejercicios de carga de impacto",
+      "Box jumps, burpees con salto, skipping de alta frecuencia",
+      "Deportes de raqueta o con cambios de dirección hasta indicación médica"
+    ],
+    nota:"Indicación médica o funcional — adaptar todos los patrones eliminando fase de vuelo"
+  },
+  "cardio suave":{
+    icon:"❤️",label:"Cardio Suave — Zona 2",color:"#dc2626",bg:"#fff1f2",border:"#dc2626",
+    priorizar:[
+      "Zona 2 aeróbica: 60-70% FC máx, el cliente puede mantener conversación",
+      "Períodos largos a baja-moderada intensidad (20-45 min continuos)",
+      "Progresión lenta: aumentar duración antes que intensidad",
+      "Trabajo de fuerza con series cortas, cargas moderadas y descansos largos"
+    ],
+    evitar:[
+      "HIIT de alta intensidad, sprints y circuitos de alta densidad",
+      "Formatos que eleven FC por encima del 80% FC máx sostenido",
+      "Superseries sin descanso y métodos de acumulación de fatiga elevada"
+    ],
+    nota:"Indicación médica — consultar con cardiólogo o médico si hay patología cardiovascular activa"
+  }
+};
+
+function buildClinicalCard(sess){
+  const notes=(sess.notes||"").toLowerCase();
+  const keywords=Object.keys(CLINICAL_NOTES);
+  const active=keywords.filter(function(kw){return notes.indexOf(kw)!==-1;});
+  if(!active.length) return "";
+
+  const blocks=active.map(function(kw){
+    const c=CLINICAL_NOTES[kw];
+    const pItems=c.priorizar.map(function(t){
+      return '<li style="margin-bottom:4px">'+t+'</li>';
+    }).join('');
+    const eItems=c.evitar.map(function(t){
+      return '<li style="margin-bottom:4px">'+t+'</li>';
+    }).join('');
+    return '<div style="border:1.5px solid '+c.border+';border-radius:10px;overflow:hidden;margin-bottom:10px">'
+      +'<div style="background:'+c.bg+';padding:9px 14px;display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:18px">'+c.icon+'</span>'
+      +'<span style="font-size:13px;font-weight:700;color:'+c.color+'">'+c.label+'</span>'
+      +'</div>'
+      +'<div style="padding:10px 14px 12px;background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +'<div>'
+      +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#059669;margin-bottom:5px">✅ Priorizar</div>'
+      +'<ul style="margin:0;padding-left:14px;font-size:11px;color:#1e293b;line-height:1.5">'+pItems+'</ul>'
+      +'</div>'
+      +'<div>'
+      +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#dc2626;margin-bottom:5px">⛔ Evitar / Precaución</div>'
+      +'<ul style="margin:0;padding-left:14px;font-size:11px;color:#1e293b;line-height:1.5">'+eItems+'</ul>'
+      +'</div>'
+      +'</div>'
+      +'<div style="padding:5px 14px 7px;background:'+c.bg+';font-size:9px;color:'+c.color+';opacity:.8">📚 '+c.nota+'</div>'
+      +'</div>';
+  }).join('');
+
+  return '<div style="margin-bottom:14px">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="font-size:13px;font-weight:700;color:#1e293b">⚕️ Consideraciones Clínicas</span>'
+    +'<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef9c3;color:#92400e;text-transform:uppercase;letter-spacing:.06em">Basadas en evidencia</span>'
+    +'</div>'
+    +blocks
+    +'</div>';
+}
+
 function renderSession(sess){
   const d=new Date(sess.date);
   const dateStr=d.toLocaleDateString("es-ES",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
@@ -8184,6 +8593,8 @@ function renderSession(sess){
       <button class="btn btn-secondary" onclick="openDownloadModal()">⬇️ Descargar</button>
       <button class="cc-toggle-btn" id="cc-toggle-btn" onclick="toggleClassCard(this)">📋 Ficha de Clase</button>
     </div>`}
+
+    ${buildClinicalCard(sess)}
 
     ${programmingCard}
 
@@ -11758,17 +12169,21 @@ function ptRpeForPhase(phaseN,urgency){
 }
 
 function analyzePTClient(){
-  var intake=(document.getElementById("pt-intake")||{}).value||"";
-  var name=(document.getElementById("pt-name")||{}).value||"Cliente";
-  var age=parseInt((document.getElementById("pt-age")||{}).value)||null;
-  var sex=(document.getElementById("pt-sex")||{}).value||"";
-  var level=(document.getElementById("pt-level")||{}).value||"intermediate";
-  var freq=parseInt((document.getElementById("pt-freq")||{}).value)||3;
-  var duration=parseInt((document.getElementById("pt-duration")||{}).value)||8;
+  // Use -a suffixed IDs (analyze view); fallback to unsuffixed (ficha view)
+  function _ptVal(id){var el=document.getElementById(id+"-a")||document.getElementById(id);return el?el.value:"";}
+  var intake=_ptVal("pt-intake");
+  var name=_ptVal("pt-name")||"Cliente";
+  var age=parseInt(_ptVal("pt-age"))||null;
+  var sex=_ptVal("pt-sex");
+  var level=_ptVal("pt-level")||"intermediate";
+  var freq=parseInt(_ptVal("pt-freq"))||3;
+  var duration=parseInt(_ptVal("pt-duration"))||8;
 
-  // Gather equipment from checkboxes
+  // Gather equipment from checkboxes — prefer analyze view chips
   var equipment=[];
-  document.querySelectorAll("#pt-eq-chips input:checked").forEach(function(cb){if(cb.value)equipment.push(cb.value);});
+  var eqSel=document.querySelectorAll("#pt-eq-chips-a input:checked");
+  if(eqSel.length===0)eqSel=document.querySelectorAll("#pt-eq-chips input:checked");
+  eqSel.forEach(function(cb){if(cb.value)equipment.push(cb.value);});
 
   if(!intake.trim()){showToast("Describe la situación del cliente para analizar");return;}
 
@@ -12019,7 +12434,8 @@ function renderPTResults(a){
   });
   html+='</div>';
 
-  document.getElementById("pt-output").innerHTML=html;
+  var outEl=document.getElementById("pt-output-a")||document.getElementById("pt-output");
+  if(outEl)outEl.innerHTML=html;
 }
 
 function generatePTSessionForPhase(phaseN){
@@ -12875,20 +13291,23 @@ analyzePTClient=async function(){
     return;
   }
 
-  var intake=(document.getElementById("pt-intake")||{}).value||"";
+  function _ptVal2(id){var el=document.getElementById(id+"-a")||document.getElementById(id);return el?el.value:"";}
+  var intake=_ptVal2("pt-intake");
   if(!intake.trim()){showToast("Describe la situación del cliente para analizar");return;}
 
-  var name=(document.getElementById("pt-name")||{}).value||"Cliente";
-  var age=parseInt((document.getElementById("pt-age")||{}).value)||null;
-  var sex=(document.getElementById("pt-sex")||{}).value||"";
-  var level=(document.getElementById("pt-level")||{}).value||"intermediate";
-  var freq=parseInt((document.getElementById("pt-freq")||{}).value)||3;
-  var duration=parseInt((document.getElementById("pt-duration")||{}).value)||8;
+  var name=_ptVal2("pt-name")||"Cliente";
+  var age=parseInt(_ptVal2("pt-age"))||null;
+  var sex=_ptVal2("pt-sex");
+  var level=_ptVal2("pt-level")||"intermediate";
+  var freq=parseInt(_ptVal2("pt-freq"))||3;
+  var duration=parseInt(_ptVal2("pt-duration"))||8;
   var equipment=[];
-  document.querySelectorAll("#pt-eq-chips input:checked").forEach(function(cb){if(cb.value)equipment.push(cb.value);});
+  var _eqEl2=document.querySelectorAll("#pt-eq-chips-a input:checked");
+  if(_eqEl2.length===0)_eqEl2=document.querySelectorAll("#pt-eq-chips input:checked");
+  _eqEl2.forEach(function(cb){if(cb.value)equipment.push(cb.value);});
 
-  var loadEl=document.getElementById("pt-ai-loading");
-  var btn=document.getElementById("pt-analyze-btn");
+  var loadEl=document.getElementById("pt-ai-loading-a")||document.getElementById("pt-ai-loading");
+  var btn=document.getElementById("pt-analyze-btn-a")||document.getElementById("pt-analyze-btn");
   if(btn)btn.disabled=true;
   if(loadEl)loadEl.style.display="flex";
 
@@ -12944,6 +13363,16 @@ analyzePTClient=async function(){
     if(btn)btn.disabled=false;
     if(loadEl)loadEl.style.display="none";
   }
+};
+
+/* ── updateAIButtons: also update new analyze-view indicator ── */
+var _origUpdateAIButtons=updateAIButtons;
+updateAIButtons=function(){
+  _origUpdateAIButtons();
+  var p=localStorage.getItem("activ_ai_provider")||"groq";
+  var key=localStorage.getItem(_providerKeyName(p));
+  var ind=document.getElementById("pt-ai-indicator-a");
+  if(ind)ind.style.display=key?"block":"none";
 };
 
 /* ── Init ── */
@@ -15296,6 +15725,418 @@ function _closeProtoFormModal(evt){
     document.getElementById("proto-form-overlay").classList.remove("open");
   }
 }
+
+// ============================================================
+// PT CLIENT DATABASE
+// ============================================================
+
+var _PT_CLIENTS_KEY='pt_clients_v2';
+
+function ptGetClients(){
+  try{return JSON.parse(localStorage.getItem(_PT_CLIENTS_KEY)||"{}");}catch(e){return {};}
+}
+
+function ptSaveClients(c){
+  try{localStorage.setItem(_PT_CLIENTS_KEY,JSON.stringify(c));}catch(e){showToast("Error guardando clientes");}
+}
+
+function ptShowView(view,clientId){
+  ['list','ficha','multi','analyze'].forEach(function(v){
+    var el=document.getElementById('pt-view-'+v);
+    if(el)el.style.display=(v===view)?'':'none';
+  });
+  ['pt-nav-list','pt-nav-multi','pt-nav-analyze'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.classList.remove('active');
+  });
+  var navMap={list:'pt-nav-list',multi:'pt-nav-multi',analyze:'pt-nav-analyze',ficha:'pt-nav-list'};
+  var navEl=document.getElementById(navMap[view]);
+  if(navEl)navEl.classList.add('active');
+  if(view==='list')ptRenderList();
+  if(view==='multi')ptRenderMulti();
+  if(view==='ficha'&&clientId)ptRenderFicha(clientId);
+}
+
+function ptRenderList(){
+  var clients=ptGetClients();
+  var q=(document.getElementById('pt-search')||{}).value||'';
+  var q2=q.toLowerCase().trim();
+  var grid=document.getElementById('pt-clients-grid');
+  if(!grid)return;
+  var keys=Object.keys(clients).filter(function(id){
+    if(!q2)return true;
+    var c=clients[id];
+    return (c.name||'').toLowerCase().indexOf(q2)!==-1;
+  });
+  if(keys.length===0){
+    grid.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--text3)">'
+      +(q2?'No se encontraron clientes para "'+q+'"':'No hay clientes aún.')
+      +'<br><button class="btn btn-primary" onclick="ptNewClient()" style="margin-top:14px;padding:9px 20px">➕ Crear primer cliente</button></div>';
+    return;
+  }
+  var html='<div class="pt-cards-grid">';
+  keys.forEach(function(id){
+    var c=clients[id];
+    var levelLabels={beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'};
+    var sexLabels={M:'♂',F:'♀',X:'⚧'};
+    var tags=(c.restrictions||[]).map(function(r){return '<span class="pt-client-card-tag">'+r+'</span>';}).join('');
+    html+='<div class="pt-client-card">'
+      +'<div class="pt-client-card-name">'+(c.name||'Sin nombre')+'</div>'
+      +'<div class="pt-client-card-meta">'+(c.age?c.age+' años · ':'')+''+(sexLabels[c.sex]||'')+(c.sex?' · ':'')+''+(levelLabels[c.level]||c.level||'')+(c.sessions&&c.sessions.length?' · '+c.sessions.length+' sesión'+(c.sessions.length===1?'':'es'):'')+'</div>'
+      +'<div class="pt-client-card-tags">'+tags+'</div>'
+      +'<div class="pt-client-card-actions">'
+      +'<button class="btn" onclick="ptOpenFicha(\''+id+'\')" style="flex:1;font-size:11px">📋 Ver ficha</button>'
+      +'<button class="btn" onclick="ptGenerateForClient(\''+id+'\')" style="flex:1;font-size:11px;background:#ede9fe;color:#6b21a8;border-color:#c4b5fd">⚡ Sesión</button>'
+      +'<button class="btn" onclick="ptDeleteClient(\''+id+'\')" style="padding:5px 8px;font-size:11px;color:#991b1b;border-color:#fca5a5">✕</button>'
+      +'</div></div>';
+  });
+  html+='</div>';
+  grid.innerHTML=html;
+}
+
+function ptNewClient(){
+  var id=Date.now().toString();
+  var clients=ptGetClients();
+  clients[id]={id:id,name:'',age:null,sex:'',level:'intermediate',equipment:[],restrictions:[],intake:'',freq:3,sessions:[],createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  ptSaveClients(clients);
+  ptOpenFicha(id);
+}
+
+function ptOpenFicha(clientId){
+  window._ptCurrentClientId=clientId;
+  ptShowView('ficha',clientId);
+}
+
+function ptRenderFicha(clientId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!c){ptShowView('list');return;}
+  var titleEl=document.getElementById('pt-ficha-title');
+  if(titleEl)titleEl.textContent=c.name||'Nuevo cliente';
+  // Fill basic fields
+  function _setVal(id,val){var el=document.getElementById(id);if(el)el.value=val||'';}
+  _setVal('pt-name',c.name);
+  _setVal('pt-age',c.age||'');
+  _setVal('pt-sex',c.sex||'');
+  _setVal('pt-level',c.level||'intermediate');
+  _setVal('pt-freq',c.freq||3);
+  _setVal('pt-duration',c.duration||8);
+  _setVal('pt-intake',c.intake||'');
+  // Restriction chips
+  document.querySelectorAll('#pt-rest-chips .restriction-chip').forEach(function(btn){
+    var kw=btn.getAttribute('data-keyword');
+    if((c.restrictions||[]).indexOf(kw)!==-1){btn.classList.add('active');}else{btn.classList.remove('active');}
+  });
+  // Equipment chips
+  document.querySelectorAll('#pt-eq-chips input[type=checkbox]').forEach(function(cb){
+    cb.checked=(c.equipment||[]).indexOf(cb.value)!==-1;
+  });
+  // Render sessions
+  ptRenderClientSessions(clientId);
+  // Clear any old session preview
+  var prev=document.getElementById('pt-gen-preview');
+  if(prev)prev.style.display='none';
+}
+
+function ptRenderClientSessions(clientId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  var listEl=document.getElementById('pt-sessions-list');
+  if(!listEl)return;
+  var sessions=c&&c.sessions?c.sessions:[];
+  if(sessions.length===0){
+    listEl.innerHTML='<div style="font-size:12px;color:var(--text3);padding:8px 0">No hay sesiones guardadas aún.</div>';
+    return;
+  }
+  var html='';
+  sessions.slice().reverse().forEach(function(s){
+    var d=new Date(s.date);
+    var dateStr=d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var blockNames=(s.sess&&s.sess.movilidad?'Mov. · ':'')+(s.sess&&s.sess.core?'Core · ':'')+(s.sess&&s.sess.fuerza?'Fuerza':'');
+    html+='<div class="pt-sess-item">'
+      +'<div style="flex:1">'
+      +'<div style="font-size:12px;font-weight:700;color:var(--text)">'+dateStr+'</div>'
+      +'<div style="font-size:11px;color:var(--text3)">'+blockNames+'</div>'
+      +'</div>'
+      +'<div class="pt-sess-item-btns">'
+      +'<button class="btn" onclick="ptViewSession(\''+clientId+'\',\''+s.id+'\')" style="padding:4px 9px;font-size:11px">👁 Ver</button>'
+      +'<button class="btn" onclick="ptDeleteSession(\''+clientId+'\',\''+s.id+'\')" style="padding:4px 8px;font-size:11px;color:#991b1b;border-color:#fca5a5">✕</button>'
+      +'</div>'
+      +'</div>';
+  });
+  listEl.innerHTML=html;
+}
+
+function ptSaveFicha(clientId){
+  var clients=ptGetClients();
+  if(!clients[clientId])return;
+  var c=clients[clientId];
+  function _getVal(id){var el=document.getElementById(id);return el?el.value:'';}
+  c.name=_getVal('pt-name').trim();
+  c.age=parseInt(_getVal('pt-age'))||null;
+  c.sex=_getVal('pt-sex');
+  c.level=_getVal('pt-level')||'intermediate';
+  c.freq=parseInt(_getVal('pt-freq'))||3;
+  c.duration=parseInt(_getVal('pt-duration'))||8;
+  c.intake=_getVal('pt-intake');
+  // Restrictions from chips
+  c.restrictions=[];
+  document.querySelectorAll('#pt-rest-chips .restriction-chip.active').forEach(function(btn){
+    c.restrictions.push(btn.getAttribute('data-keyword'));
+  });
+  // Equipment from checkboxes
+  c.equipment=[];
+  document.querySelectorAll('#pt-eq-chips input:checked').forEach(function(cb){
+    if(cb.value)c.equipment.push(cb.value);
+  });
+  c.updatedAt=new Date().toISOString();
+  ptSaveClients(clients);
+  var titleEl=document.getElementById('pt-ficha-title');
+  if(titleEl)titleEl.textContent=c.name||'Nuevo cliente';
+  showToast('💾 Ficha guardada — '+(c.name||'cliente'));
+}
+
+function ptDeleteClient(clientId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!confirm('¿Borrar el cliente '+(c?c.name||'sin nombre':'')+'? Esta acción no se puede deshacer.'))return;
+  delete clients[clientId];
+  ptSaveClients(clients);
+  showToast('🗑 Cliente eliminado');
+  ptRenderList();
+}
+
+function ptGenerateForClient(clientId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!c){showToast('Cliente no encontrado');return;}
+  // Make sure we are in the ficha view
+  if(window._ptCurrentClientId!==clientId){
+    ptOpenFicha(clientId);
+  }
+  // Build notes from restrictions + intake
+  var restrictionStr=(c.restrictions||[]).join(', ');
+  var notes=(restrictionStr?restrictionStr+'. ':'')+(c.intake||'');
+  var eq=c.equipment&&c.equipment.length>0?c.equipment:['none'];
+  var sess=generateSession({
+    trainer:'',client:c.name||'',level:c.level||'intermediate',
+    focus:'full_body',strFormat:'random',hiitFormat:'random',
+    notes:notes,sesNum:1,mesPrograma:1,semPrograma:1,
+    objGen:'',objEsp:'',groupSize:1,equipment:eq
+  });
+  window._ptCurrentSess=sess;
+  window._ptCurrentClientId=clientId;
+  // Show preview — reuse the existing session renderer if available
+  var previewEl=document.getElementById('pt-gen-preview');
+  var contentEl=document.getElementById('pt-gen-preview-content');
+  if(contentEl&&typeof buildSessionHTML==='function'){
+    contentEl.innerHTML=buildSessionHTML(sess);
+  } else if(contentEl&&typeof renderSessionOutput==='function'){
+    contentEl.innerHTML=renderSessionOutput(sess);
+  } else if(contentEl){
+    // Fallback compact render
+    contentEl.innerHTML=ptBuildCompactCard(c,sess);
+  }
+  if(previewEl)previewEl.style.display='block';
+  // Scroll to preview
+  if(previewEl)previewEl.scrollIntoView({behavior:'smooth',block:'start'});
+  showToast('⚡ Sesión generada para '+c.name);
+}
+
+function ptSaveSessionToClient(clientId){
+  if(!window._ptCurrentSess){showToast('No hay sesión generada');return;}
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!c)return;
+  if(!c.sessions)c.sessions=[];
+  var sessEntry={id:Date.now(),date:new Date().toISOString(),sess:window._ptCurrentSess};
+  c.sessions.push(sessEntry);
+  c.updatedAt=new Date().toISOString();
+  ptSaveClients(clients);
+  window._ptCurrentSess=null;
+  var previewEl=document.getElementById('pt-gen-preview');
+  if(previewEl)previewEl.style.display='none';
+  ptRenderClientSessions(clientId);
+  showToast('💾 Sesión guardada en la ficha de '+(c.name||'cliente'));
+}
+
+function ptViewSession(clientId,sessionId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!c)return;
+  var s=(c.sessions||[]).find(function(s){return String(s.id)===String(sessionId);});
+  if(!s){showToast('Sesión no encontrada');return;}
+  window._ptCurrentSess=s.sess;
+  var previewEl=document.getElementById('pt-gen-preview');
+  var contentEl=document.getElementById('pt-gen-preview-content');
+  if(contentEl&&typeof buildSessionHTML==='function'){
+    contentEl.innerHTML=buildSessionHTML(s.sess);
+  } else if(contentEl&&typeof renderSessionOutput==='function'){
+    contentEl.innerHTML=renderSessionOutput(s.sess);
+  } else if(contentEl){
+    contentEl.innerHTML=ptBuildCompactCard(c,s.sess);
+  }
+  if(previewEl){previewEl.style.display='block';previewEl.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+
+function ptDeleteSession(clientId,sessionId){
+  var clients=ptGetClients();
+  var c=clients[clientId];
+  if(!c||!c.sessions)return;
+  if(!confirm('¿Eliminar esta sesión guardada?'))return;
+  c.sessions=c.sessions.filter(function(s){return String(s.id)!==String(sessionId);});
+  c.updatedAt=new Date().toISOString();
+  ptSaveClients(clients);
+  ptRenderClientSessions(clientId);
+  showToast('🗑 Sesión eliminada');
+}
+
+function _ptToggleRestr(btn){
+  btn.classList.toggle('active');
+}
+
+// ── VISTA MULTI ──────────────────────────────────────────────
+
+var _ptMultiSlots=[null,null,null,null];
+var _ptMultiSessSlots=[null,null,null,null];
+
+function ptRenderMulti(){
+  var clients=ptGetClients();
+  var keys=Object.keys(clients);
+  var selectorsEl=document.getElementById('pt-multi-selectors');
+  if(!selectorsEl)return;
+  var html='';
+  for(var i=0;i<4;i++){
+    html+='<div>'
+      +'<label class="pt-field-label">Slot '+(i+1)+'</label>'
+      +'<select onchange="ptMultiSelectClient('+i+',this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:var(--surface);color:var(--text);margin-bottom:5px">'
+      +'<option value="">— Sin cliente —</option>';
+    keys.forEach(function(id){
+      var sel=_ptMultiSlots[i]===id?' selected':'';
+      html+='<option value="'+id+'"'+sel+'>'+(clients[id].name||'Sin nombre')+'</option>';
+    });
+    html+='</select>';
+    // Session selector for this slot
+    if(_ptMultiSlots[i]){
+      var sc=clients[_ptMultiSlots[i]];
+      html+='<select onchange="ptMultiSelectSess('+i+',this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12px;background:var(--surface);color:var(--text)">'
+        +'<option value="last">Última sesión</option>';
+      (sc.sessions||[]).slice().reverse().forEach(function(s){
+        var d=new Date(s.date);
+        var ds=d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'});
+        var sel2=_ptMultiSessSlots[i]===String(s.id)?' selected':'';
+        html+='<option value="'+s.id+'"'+sel2+'>'+ds+'</option>';
+      });
+      html+='</select>';
+    }
+    html+='</div>';
+  }
+  selectorsEl.innerHTML=html;
+  ptRenderMultiGrid();
+}
+
+function ptMultiSelectClient(slotIdx,clientId){
+  _ptMultiSlots[slotIdx]=clientId||null;
+  _ptMultiSessSlots[slotIdx]=null;
+  ptRenderMulti();
+}
+
+function ptMultiSelectSess(slotIdx,sessId){
+  _ptMultiSessSlots[slotIdx]=sessId==='last'?null:sessId;
+  ptRenderMultiGrid();
+}
+
+function ptRenderMultiGrid(){
+  var clients=ptGetClients();
+  var gridEl=document.getElementById('pt-multi-grid');
+  if(!gridEl)return;
+  var html='';
+  for(var i=0;i<4;i++){
+    var cid=_ptMultiSlots[i];
+    if(!cid){html+='<div class="pt-multi-card" style="color:var(--text3);font-size:12px;display:flex;align-items:center;justify-content:center;min-height:160px">Slot '+(i+1)+' vacío</div>';continue;}
+    var c=clients[cid];
+    if(!c){html+='<div class="pt-multi-card">Cliente no encontrado</div>';continue;}
+    var sessions=c.sessions||[];
+    var sessData=null;
+    if(sessions.length>0){
+      if(_ptMultiSessSlots[i]){
+        var found=sessions.find(function(s){return String(s.id)===String(_ptMultiSessSlots[i]);});
+        sessData=found?found.sess:sessions[sessions.length-1].sess;
+      } else {
+        sessData=sessions[sessions.length-1].sess;
+      }
+    }
+    html+=ptBuildCompactCard(c,sessData);
+  }
+  gridEl.innerHTML=html;
+}
+
+function ptBuildCompactCard(client,sessData){
+  var levelLabels={beginner:'Principiante',intermediate:'Intermedio',advanced:'Avanzado'};
+  var sexLabels={M:'♂',F:'♀',X:'⚧'};
+  var html='<div class="pt-multi-card">';
+  html+='<div class="pt-multi-card-hdr">👤 '+(client.name||'Sin nombre')
+    +(client.age?' · '+client.age+'a':'')
+    +(client.sex&&sexLabels[client.sex]?' · '+sexLabels[client.sex]:'')+'</div>';
+  var tags=(client.restrictions||[]).map(function(r){return '<span class="pt-multi-card-tag">'+r+'</span>';}).join('');
+  if(tags)html+='<div class="pt-multi-card-tags">'+tags+'</div>';
+  if(!sessData){
+    html+='<div style="font-size:11px;color:var(--text3);padding:8px 0">Sin sesión guardada</div>';
+  } else {
+    // Movilidad
+    if(sessData.movilidad&&sessData.movilidad.length){
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🟢 Movilidad</div><ol>';
+      sessData.movilidad.forEach(function(e){html+='<li>'+(e.name||e)+(e.dose?' · '+e.dose:'')+'</li>';});
+      html+='</ol></div>';
+    }
+    // Core
+    if(sessData.core&&sessData.core.length){
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🟡 Core (3V × 30\'\'/10\'\')</div><ol>';
+      sessData.core.forEach(function(e){html+='<li>'+(e.name||e)+'</li>';});
+      html+='</ol></div>';
+    }
+    // Activacion
+    if(sessData.activacion&&sessData.activacion.length){
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🔵 Activación</div><ol>';
+      sessData.activacion.forEach(function(e){html+='<li>'+(e.name||e)+(e.dose?' · '+e.dose:'')+'</li>';});
+      html+='</ol></div>';
+    }
+    // Fuerza
+    if(sessData.fuerza&&sessData.fuerza.length){
+      var fmtLabel=sessData.strFormatLabel||sessData.strFormat||'Fuerza';
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🔴 '+fmtLabel+'</div><ol>';
+      sessData.fuerza.forEach(function(e){html+='<li>'+(e.name||e)+(e.dose?' · '+e.dose:'')+'</li>';});
+      html+='</ol></div>';
+    }
+    // HIIT
+    if(sessData.hiit&&sessData.hiit.length){
+      var hiitLabel=sessData.hiitFormatLabel||sessData.hiitFormat||'HIIT';
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🟣 '+hiitLabel+'</div><ol>';
+      sessData.hiit.forEach(function(e){html+='<li>'+(e.name||e)+(e.dose?' · '+e.dose:'')+'</li>';});
+      html+='</ol></div>';
+    }
+    // Cooldown
+    if(sessData.cooldown&&sessData.cooldown.length){
+      html+='<div class="pt-multi-block"><div class="pt-multi-block-hdr">🟢 Cooldown</div><ol>';
+      sessData.cooldown.forEach(function(e){html+='<li>'+(e.name||e)+(e.dose?' · '+e.dose:'')+'</li>';});
+      html+='</ol></div>';
+    }
+  }
+  html+='</div>';
+  return html;
+}
+
+function ptPrintMulti(){
+  window.print();
+}
+
+// ── Init PT views on load ────────────────────────────────────
+(function(){
+  // Show list view by default (tab will be hidden until user navigates to PT tab anyway)
+  // Re-initialize is harmless
+  var listEl=document.getElementById('pt-view-list');
+  if(listEl){ptRenderList();}
+})();
 </script>
 
 <!-- Regenerate dropdown (shared, positioned via JS) -->
